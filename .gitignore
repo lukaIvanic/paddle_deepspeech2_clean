@@ -34,7 +34,13 @@ data/manifests/veprad/speaker_cv/*
 *.pth
 *.safetensors
 
-# Decoded per-utterance outputs include transcript text.
+# Run details that include transcript text or generated data stay local.
+results/**/details/decoded/
+results/**/details/analysis/utterance_metrics.tsv
+results/**/details/analysis/top_30_errors.md
+results/**/details/generated/
+
+# Legacy result layouts, kept ignored in case an old run dump exists locally.
 results/**/exp/**/checkpoints/*.rsl
 results/**/utterance_metrics.tsv
 results/**/top_30_errors.md

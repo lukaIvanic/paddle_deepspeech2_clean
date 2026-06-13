@@ -29,11 +29,12 @@ end to end.
   VEPRAD manifests into PaddleSpeech raw JSONL.
 - `scripts/recompute_asr_metrics.py`: independently recomputes WER/CER from a
   PaddleSpeech result file.
-- `results/paddlespeech_ds2_veprad_full_2026-06-13/`: archived completed run
-  outputs, logs, configs, decoded hypotheses, metrics, and error analysis.
+- `results/2026-06-13_ds2_baseline_veprad/`: completed baseline run summary
+  and tracked supporting details.
 
-The checkpoint weights are not stored here. The archived results contain decoded
-outputs and logs, and the bundled recipe/data can regenerate checkpoints.
+The checkpoint weights are not stored here. Public result folders keep summaries,
+configs, metrics, and logs; local ignored details may contain decoded outputs.
+The bundled recipe/data can regenerate checkpoints.
 
 ## Environment Setup
 
@@ -135,14 +136,11 @@ from speakers that are still represented in training.
 - `scripts/data.sh`: VEPRAD data preparation stages.
 - `scripts/run.sh`: recipe driver for data preparation, training, averaging, and
   testing.
-- `results/paddlespeech_ds2_veprad_full_2026-06-13/README.md`: archived run
-  summary.
-- `results/paddlespeech_ds2_veprad_full_2026-06-13/exp/deepspeech2/checkpoints/avg_1.rsl`:
-  test references and hypotheses.
-- `results/paddlespeech_ds2_veprad_full_2026-06-13/metrics.json`: independent
-  metric calculation.
-- `results/paddlespeech_ds2_veprad_full_2026-06-13/top_30_errors.md`: worst
-  decoded test examples.
+- `results/2026-06-13_ds2_baseline_veprad/summary.md`: archived run summary.
+- `results/2026-06-13_ds2_baseline_veprad/details/metrics.json`:
+  independent metric calculation.
+- `results/2026-06-13_ds2_baseline_veprad/details/training_curve.tsv`:
+  parsed epoch/dev-loss curve.
 
 ## Important Notes
 
