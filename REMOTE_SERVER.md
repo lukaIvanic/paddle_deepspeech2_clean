@@ -81,6 +81,52 @@ git clone https://github.com/PaddlePaddle/PaddleSpeech.git PaddleSpeech
 git -C PaddleSpeech checkout 6b25a400008d393f9c3af837b3c692b17f29ee1a
 ```
 
+## Remote Data Layout
+
+The clean workspace should contain the same audited data layout as the local
+project, but the data files themselves stay ignored by Git:
+
+```text
+data/test/
+data/cross_validation_splits/raw_train_val/
+data/cross_validation_splits/cv_20260613_001/
+data/quarantine/sm04/
+```
+
+`data/test/` contains the frozen held-out test data and its JSONL manifests.
+`data/cross_validation_splits/raw_train_val/` contains the train/validation
+source pool after the frozen test data has been removed. The concrete CV split
+folder contains only JSONL manifests that reference files in `raw_train_val`.
+`data/quarantine/sm04/` is kept separate because `sm04` was excluded from the
+audited VEPRAD split pipeline.
+
+To copy the audited local layout into the clean remote workspace:
+
+```bash
+COPYFILE_DISABLE=1 tar -C "$PWD" -cf - \
+  data/test \
+  data/cross_validation_splits/raw_train_val \
+  data/cross_validation_splits/cv_20260613_001 \
+  data/quarantine/sm04 \
+| ssh vast_rogj_asr 'set -e; PROJECT=/workspace/rogj_paddlespeech_ds2_clean/paddle_deepspeech2_clean; cd "$PROJECT"; tar -xf -'
+```
+
+After copying, verify at minimum:
+
+```text
+data/test/test.jsonl                                      993 rows
+data/test/test_seen_speakers.jsonl                       486 rows
+data/test/test_unseen_speakers.jsonl                     507 rows
+data/cross_validation_splits/raw_train_val/source.jsonl  4262 rows
+data/cross_validation_splits/cv_20260613_001/train.jsonl 3225 rows
+data/cross_validation_splits/cv_20260613_001/val.jsonl   1037 rows
+```
+
+Also verify that all manifest `audio_filepath` values are relative paths, all
+referenced audio files exist, no manifest contains `sm04`, and train/validation,
+train/test, validation/test, and source/test utterance-id intersections are all
+zero.
+
 ## Python Environment
 
 The project virtual environment is expected at:
