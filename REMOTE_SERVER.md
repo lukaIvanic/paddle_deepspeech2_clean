@@ -47,12 +47,16 @@ Look for the instance labeled `rogj-paddlespeech-ds2`.
 
 ## Remote Project Path
 
-The remote base directory used for this work is:
+The clean remote base directory for new work is:
 
 ```bash
-BASE=/workspace/rogj_paddlespeech_ds2
+BASE=/workspace/rogj_paddlespeech_ds2_clean
 PROJECT=$BASE/paddle_deepspeech2_clean
 ```
+
+Do not use `/workspace/rogj_paddlespeech_ds2` for new runs. That older
+directory contains the exploratory/baseline recipe setup and old outputs, and is
+kept only as a legacy reference.
 
 First-time checkout:
 
@@ -66,6 +70,15 @@ Update an existing checkout:
 ```bash
 cd "$PROJECT"
 git pull --ff-only
+```
+
+The public repo ignores the official PaddleSpeech source checkout. Provision it
+inside the clean project clone:
+
+```bash
+cd "$PROJECT"
+git clone https://github.com/PaddlePaddle/PaddleSpeech.git PaddleSpeech
+git -C PaddleSpeech checkout 6b25a400008d393f9c3af837b3c692b17f29ee1a
 ```
 
 ## Python Environment
