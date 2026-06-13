@@ -106,7 +106,7 @@ def target_relpath(original_relpath: Path, output_raw_root: Path) -> Path:
     return output_raw_root / suffix
 
 
-def rewrite_row(row: dict, project_root: Path, output_raw_root: Path) -> dict:
+def rewrite_row(row: dict, output_raw_root: Path) -> dict:
     new_row = dict(row)
     audio_rel = target_relpath(relpath_for(row, "audio_relpath"), output_raw_root)
     transcript_rel = target_relpath(
@@ -115,9 +115,9 @@ def rewrite_row(row: dict, project_root: Path, output_raw_root: Path) -> dict:
 
     new_row["audio_relpath"] = audio_rel.as_posix()
     new_row["transcript_relpath"] = transcript_rel.as_posix()
-    new_row["audio_filepath"] = str((project_root / audio_rel).resolve())
-    new_row["transcript_filepath"] = str((project_root / transcript_rel).resolve())
-    new_row["raw_root"] = str((project_root / output_raw_root).resolve())
+    new_row["audio_filepath"] = audio_rel.as_posix()
+    new_row["transcript_filepath"] = transcript_rel.as_posix()
+    new_row["raw_root"] = output_raw_root.as_posix()
     return new_row
 
 
@@ -307,12 +307,9 @@ def run(args: argparse.Namespace) -> int:
 
     test_raw_rel = args.test_dir / "raw" / "veprad"
     train_val_raw_rel = args.train_val_dir / "raw" / "veprad"
-    test_rows = [
-        rewrite_row(row, project_root, test_raw_rel) for row in test_rows_original
-    ]
+    test_rows = [rewrite_row(row, test_raw_rel) for row in test_rows_original]
     train_val_rows = [
-        rewrite_row(row, project_root, train_val_raw_rel)
-        for row in train_val_rows_original
+        rewrite_row(row, train_val_raw_rel) for row in train_val_rows_original
     ]
 
     source_id_hash = sha256_text(sorted(row["utterance_id"] for row in rows))

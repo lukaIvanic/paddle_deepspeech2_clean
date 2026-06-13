@@ -51,7 +51,7 @@ def convert_split(
             out_row = {
                 "utt": row.get("utterance_id") or Path(audio_relpath).stem,
                 "utt2spk": row.get("speaker_id") or "unknown",
-                "feat": str(audio_path),
+                "feat": audio_relpath,
                 "feat_shape": [float(row["duration"])],
                 "text": row["text"],
             }
