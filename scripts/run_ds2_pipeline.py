@@ -581,6 +581,9 @@ def train_and_eval(
     metrics_dir = run_dir / "details" / "metrics"
     analysis_dir = run_dir / "details" / "analysis"
     logs_dir = run_dir / "details" / "logs"
+    eval_dir.mkdir(parents=True, exist_ok=True)
+    metrics_dir.mkdir(parents=True, exist_ok=True)
+    analysis_dir.mkdir(parents=True, exist_ok=True)
 
     summary = {
         "model_dir": rel_to_project(project_root, model_dir),
@@ -631,6 +634,7 @@ def train_and_eval(
         result_file = eval_dir / f"{eval_name}.rsl"
         metrics_file = metrics_dir / f"{eval_name}.json"
         utterance_file = analysis_dir / f"{eval_name}.utterance_metrics.tsv"
+        result_file.parent.mkdir(parents=True, exist_ok=True)
         eval_config = build_eval_config(CfgNode, project_root, args, prepared, eval_name)
         test_args = make_test_args(
             default_argument_parser=default_argument_parser,
@@ -773,11 +777,18 @@ def run_one_split(
     split_id = split_id_from_dir(split_dir)
     run_name = base_run_name if total_splits == 1 else f"{base_run_name}_{split_id}"
     run_dir = as_project_path(project_root, args.results_root) / run_name
-    if run_dir.exists() and not args.force_run:
-        raise SystemExit(f"Refusing to overwrite existing run: {run_dir}")
+    if args.force_run and args.reuse_run_dir:
+        raise SystemExit("--force-run and --reuse-run-dir cannot be used together")
     if run_dir.exists():
-        shutil.rmtree(run_dir)
-    run_dir.mkdir(parents=True, exist_ok=False)
+        if args.force_run:
+            shutil.rmtree(run_dir)
+            run_dir.mkdir(parents=True, exist_ok=False)
+        elif args.reuse_run_dir:
+            run_dir.mkdir(parents=True, exist_ok=True)
+        else:
+            raise SystemExit(f"Refusing to overwrite existing run: {run_dir}")
+    else:
+        run_dir.mkdir(parents=True, exist_ok=False)
 
     copy_public_configs(project_root, run_dir, args)
     prepared = prepare_paddlespeech_data(project_root, split_dir, run_dir, args)
@@ -836,6 +847,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     )
     parser.add_argument("--force-split", action="store_true")
     parser.add_argument("--force-run", action="store_true")
+    parser.add_argument(
+        "--reuse-run-dir",
+        action="store_true",
+        help="Reuse an existing results/<run-name> directory without deleting checkpoints.",
+    )
 
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--decode-config", type=Path, default=DEFAULT_DECODE_CONFIG)
