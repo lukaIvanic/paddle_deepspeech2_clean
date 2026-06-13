@@ -45,9 +45,20 @@ data/cross_validation_splits/*/*
 
 # Run details that include transcript text or generated data stay local.
 results/**/details/decoded/
+results/**/details/eval/
 results/**/details/analysis/utterance_metrics.tsv
 results/**/details/analysis/top_30_errors.md
+results/**/details/analysis/*.tsv
 results/**/details/generated/
+results/**/details/logs/eval_*.log
+results/**/details/logs/eval_*.stdout.log
+results/**/details/logs/test*.log
+results/**/details/model/checkpoints/
+results/**/details/model/decode/
+results/**/details/model/export/
+results/**/details/model/log/
+results/**/details/model/test/
+results/**/details/model/visual/
 
 # Legacy result layouts, kept ignored in case an old run dump exists locally.
 results/**/exp/**/checkpoints/*.rsl

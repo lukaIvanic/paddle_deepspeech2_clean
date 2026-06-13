@@ -3,14 +3,14 @@
 Self-contained folder for the official PaddleSpeech DeepSpeech2 VEPRAD run.
 
 This folder replaces the old toy/local DeepSpeech2 experiments. It contains the
-VEPRAD split metadata, PaddleSpeech source checkout, recipe files, helper
-scripts, and archived completed-run outputs needed to reproduce or audit the
+VEPRAD split metadata, PaddleSpeech source checkout, Python pipeline scripts,
+and archived completed-run outputs needed to reproduce or audit the
 from-scratch PaddleSpeech DeepSpeech2 baseline.
 
 GitHub note: the public repository intentionally excludes the official
 `PaddleSpeech/` checkout, raw VEPRAD corpus, JSONL transcript manifests,
 generated PaddleSpeech data, checkpoint/model files, and per-utterance decoded
-transcript outputs. A local/private full bundle is needed to rerun the recipe
+transcript outputs. A local/private full bundle is needed to rerun the pipeline
 end to end.
 
 ## What Is Here
@@ -23,18 +23,18 @@ end to end.
   future train/validation splits. The local JSONL manifest and raw audio/text
   files are ignored by Git.
 - `data/cross_validation_splits/`: parent folder for future CV split folders.
-- `data/paddlespeech/`: generated PaddleSpeech raw manifests. This directory is
-  created by `scripts/data.sh` during stage `-1` and is not required before the
-  first run.
 - `conf/`: training, preprocessing, and decode configs.
-- `scripts/`: adapted PaddleSpeech recipe scripts for VEPRAD plus helper
-  utilities. `scripts/run.sh` is the main recipe entrypoint.
+- `scripts/`: direct Python pipeline and helper utilities for VEPRAD.
 - `scripts/create_frozen_test_split.py`: one-time script that physically
   separated the frozen test split from the train/validation source pool.
 - `scripts/create_cv_split.py`: creates one train/validation split from
   `data/cross_validation_splits/raw_train_val/source.jsonl`.
 - `scripts/convert_project_manifests_to_paddlespeech.py`: converts bundled
   VEPRAD manifests into PaddleSpeech raw JSONL.
+- `scripts/run_ds2_pipeline.py`: creates or reuses a CV split, prepares
+  PaddleSpeech manifests/vocabulary/CMVN, trains DeepSpeech2 by directly
+  calling PaddleSpeech Python entrypoints, averages the checkpoint, and
+  evaluates validation/test seen/unseen subsets.
 - `scripts/recompute_asr_metrics.py`: independently recomputes WER/CER from a
   PaddleSpeech result file.
 - `results/2026-06-13_ds2_baseline_veprad/`: completed baseline run summary
@@ -42,7 +42,7 @@ end to end.
 
 The checkpoint weights are not stored here. Public result folders keep summaries,
 configs, metrics, and logs; local ignored details may contain decoded outputs.
-The bundled recipe/data can regenerate checkpoints.
+The Python pipeline can regenerate checkpoints.
 
 ## Environment Setup
 
@@ -76,14 +76,21 @@ Expected commit:
 6b25a400008d393f9c3af837b3c692b17f29ee1a
 ```
 
-After a train/validation split has been generated and converted to the
-PaddleSpeech `data/manifest.*` files, run the recipe:
+The preferred run path is the direct Python pipeline:
 
 ```bash
-bash scripts/run.sh --stage 0 --stop_stage 0 --gpus 0
-bash scripts/run.sh --stage 1 --stop_stage 1 --gpus 0
-bash scripts/run.sh --stage 2 --stop_stage 3 --gpus 0 --avg_num 1
+python scripts/run_ds2_pipeline.py \
+  --run-name ds2_cv_001 \
+  --split-dir data/cross_validation_splits/cv_20260613_001 \
+  --device gpu \
+  --gpu-id 0 \
+  --avg-num 1
 ```
+
+If `--split-dir` is omitted, the script creates a fresh random CV split from
+`data/cross_validation_splits/raw_train_val/source.jsonl`. The script writes the
+model, generated PaddleSpeech files, logs, metrics, and run summary under
+`results/<run-name>/`. It calls PaddleSpeech Python functions directly.
 
 ## Dataset Split Pipeline
 
@@ -161,9 +168,8 @@ from speakers that are still represented in training.
 - `data/test/test.meta.json`: frozen test split audit metadata.
 - `data/cross_validation_splits/raw_train_val/source.meta.json`: non-test
   train/validation source pool audit metadata.
-- `scripts/data.sh`: VEPRAD data preparation stages.
-- `scripts/run.sh`: recipe driver for data preparation, training, averaging, and
-  testing.
+- `scripts/run_ds2_pipeline.py`: direct split/train/eval pipeline.
+- `scripts/create_cv_split.py`: cross-validation split generator.
 - `results/2026-06-13_ds2_baseline_veprad/summary.md`: archived run summary.
 - `results/2026-06-13_ds2_baseline_veprad/details/metrics.json`:
   independent metric calculation.
@@ -172,13 +178,13 @@ from speakers that are still represented in training.
 
 ## Important Notes
 
-The train-only vocabulary choice is intentional. `scripts/data.sh` builds
-`data/lang_char/vocab.txt` only from `data/manifest.train.raw`, so dev/test
-transcripts do not leak into the vocabulary.
+The train-only vocabulary choice is intentional. `scripts/run_ds2_pipeline.py`
+builds the character vocabulary only from the training manifest, so validation
+and test transcripts do not leak into the vocabulary.
 
 The preprocessing config has no augmentation. This avoids applying train-time
 SpecAugment-style transforms to dev/test through the shared PaddleSpeech
 preprocessing path.
 
-The recipe uses relative paths from this folder. It should not depend on the old
-`Projekt - DeepSpeech2` location or a hardcoded `/workspace` path.
+The pipeline uses relative paths from this folder. It should not depend on the
+old `Projekt - DeepSpeech2` location or a hardcoded `/workspace` path.

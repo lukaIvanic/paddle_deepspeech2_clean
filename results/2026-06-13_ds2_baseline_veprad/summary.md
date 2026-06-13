@@ -43,15 +43,11 @@ the checkpoint by dev loss.
 - Decoder: CTC beam search with `beam_size: 1`
 - External language model: none
 
-## Recipe Commands
+## Historical Run Path
 
-The run was initiated through the adapted PaddleSpeech recipe shell scripts:
-
-```bash
-bash scripts/run.sh --stage 0 --stop_stage 0 --gpus 0
-bash scripts/run.sh --stage 1 --stop_stage 1 --gpus 0
-bash scripts/run.sh --stage 2 --stop_stage 3 --gpus 0 --avg_num 1
-```
+The run was initiated through the earlier adapted PaddleSpeech shell recipe.
+That active recipe has since been replaced by the direct Python pipeline in
+`scripts/run_ds2_pipeline.py`.
 
 ## Dev Curve
 

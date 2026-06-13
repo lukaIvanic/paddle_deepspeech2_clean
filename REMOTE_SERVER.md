@@ -105,16 +105,18 @@ numpy==1.26.4
 NumPy `1.26.4` is intentional because PaddleSpeech `1.5.0` imports APIs that
 are removed in NumPy 2.x.
 
-## Recipe Commands
+## Pipeline Command
 
-Once the ignored local assets are in place, the standard recipe commands are:
+Once the ignored local assets are in place, run the direct Python pipeline:
 
 ```bash
-bash scripts/run.sh --stage 0 --stop_stage 0 --gpus 0
-bash scripts/run.sh --stage 1 --stop_stage 1 --gpus 0
-bash scripts/run.sh --stage 2 --stop_stage 3 --gpus 0 --avg_num 1
+python scripts/run_ds2_pipeline.py \
+  --run-name ds2_cv_001 \
+  --split-dir data/cross_validation_splits/cv_20260613_001 \
+  --device gpu \
+  --gpu-id 0 \
+  --avg-num 1
 ```
 
-Outputs are written inside the remote project checkout, mainly under `exp/` and
-`data/`. Keep model weights, generated data, and per-utterance outputs out of
-Git.
+Outputs are written under `results/<run-name>/`. Keep model weights, generated
+data, and per-utterance outputs out of Git.
