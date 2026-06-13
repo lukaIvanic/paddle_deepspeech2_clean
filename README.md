@@ -309,6 +309,41 @@ decoding substantially improved both models, especially on repeated
 weather-report language, but the GRU model remained the stronger acoustic model
 under the same split and decoder settings.
 
+## KenLM Decoder Sweep Across Models
+
+A shared KenLM decoder-parameter sweep was then run for all three trained
+paper-style models on the same `cv_paper_small_001` split. The sweep did not
+retrain acoustic models or change the KenLM n-gram order. Each row reused the
+model's trained `avg_1` acoustic checkpoint and its filtered word-level 5-gram
+KenLM.
+
+The shared sweep grid was:
+
+- `beam_size: 5, 10, 20, 40` with `alpha: 2.5`, `beta: 0.3`
+- `beam_size: 20`, `beta: 0.3`, with `alpha: 2.0` and `alpha: 3.0`
+- `beam_size: 20`, `alpha: 2.5`, with `beta: 0.0` and `beta: 0.6`
+
+The best validation-selected row was the same for all three models:
+`beam_size: 40`, `alpha: 2.5`, `beta: 0.3`.
+
+| Model | Parameters | Best validation setting | Validation WER | Test WER | Test seen speakers | Test unseen speakers |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| paper-small 5-layer GRU | `36.21M` | `beam=40, alpha=2.5, beta=0.3` | `0.088331` | `0.118312` | `0.075366` | `0.160338` |
+| 7-layer GRU | `50.73M` | `beam=40, alpha=2.5, beta=0.3` | `0.093750` | `0.127067` | `0.082616` | `0.170721` |
+| 7-layer LSTM | `67.61M` | `beam=40, alpha=2.5, beta=0.3` | `0.123254` | `0.150864` | `0.094850` | `0.205874` |
+
+The paper-small 5-layer GRU model is the strongest model in this sweep, despite
+having fewer parameters than the deeper variants. The 7-layer GRU remains
+stronger than the 7-layer LSTM. Seen-speaker subsets are consistently easier
+than unseen-speaker subsets across all models.
+
+Detailed sweep tables are tracked in:
+
+- `results/kenlm_sweep_all_models/summary.md`
+- `results/paper_small_001_kenlm_sweep_all/summary.md`
+- `results/paper_7gru_001_kenlm_sweep_all/summary.md`
+- `results/paper_7lstm_001_kenlm_sweep_all/summary.md`
+
 ## Earlier Archived Run
 
 - Date: 2026-06-13
@@ -347,6 +382,12 @@ under the same split and decoder settings.
   parsed epoch/dev-loss curve.
 - `results/paper_small_001_kenlm_sweep_val/summary.md`: validation-only KenLM
   decode sweep for the paper-small run.
+- `results/kenlm_sweep_all_models/summary.md`: shared all-subset KenLM decoder
+  sweep comparison across the paper-small, 7-layer GRU, and 7-layer LSTM runs.
+- `results/paper_small_001_kenlm_sweep_all/summary.md`,
+  `results/paper_7gru_001_kenlm_sweep_all/summary.md`, and
+  `results/paper_7lstm_001_kenlm_sweep_all/summary.md`: per-model all-subset
+  KenLM decoder sweeps.
 
 ## Important Notes
 
