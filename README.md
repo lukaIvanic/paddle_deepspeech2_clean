@@ -199,6 +199,72 @@ auditable in metadata.
 - Test seen-speaker WER: `0.280320`
 - Test unseen-speaker WER: `0.486651`
 
+KenLM beam-search decoding was also evaluated for this run in the local/remote
+run folder `results/ds2_cv_20260613_001_lm_beam10/`. That diagnostic used a
+5-gram KenLM trained from all 3225 train transcripts for the split. It was not
+the final stricter LM protocol because the LM corpus was not yet filtered
+against validation/test transcript repetition.
+
+- Decode: KenLM 5-gram, CTC beam search, `beam_size: 10`, `alpha: 2.5`,
+  `beta: 0.3`
+- Validation WER: `0.079664`
+- Validation seen-speaker WER: `0.061952`
+- Validation unseen-speaker WER: `0.088821`
+- Test WER: `0.121155`
+- Test seen-speaker WER: `0.065549`
+- Test unseen-speaker WER: `0.175764`
+
+## Paper-Small Approximation Run
+
+- Date: 2026-06-13
+- Run folders: `results/paper_small_001_nolm_beam1/` and
+  `results/paper_small_001_kenlm5_beam10/`
+- CV split: `data/cross_validation_splits/cv_paper_small_001/`
+- Training utterances: `3057`
+- Validation utterances: `1205`
+- Frozen test utterances: `993`
+- Model: official PaddleSpeech `DeepSpeech2Model`, configured to approximate
+  the smaller Deep Speech 2 paper model as closely as possible without editing
+  PaddleSpeech source
+- Architecture: 2 convolution layers, 5 bidirectional GRU layers, hidden size
+  650
+- Parameters: `36.21M`
+- Features: 161-bin `fbank_kaldi` with CMVN
+- Best checkpoint: epoch 11, selected by validation loss `35.604879`
+
+No-LM decoding used the CTC beam-search path with `beam_size: 1`.
+
+| Subset | WER |
+| --- | ---: |
+| Validation | `0.420641` |
+| Validation seen speakers | `0.344741` |
+| Validation unseen speakers | `0.451422` |
+| Test | `0.452892` |
+| Test seen speakers | `0.350400` |
+| Test unseen speakers | `0.553545` |
+
+KenLM decoding used a split-owned 5-gram LM, `beam_size: 10`, `alpha: 2.5`,
+and `beta: 0.3`. Unlike the earlier LM diagnostic, the LM corpus was filtered
+against the validation split and frozen test set: 2290 of 3057 train rows were
+kept, while 767 rows were excluded because their normalized transcript exactly
+or fuzzily matched held-out text.
+
+| Subset | WER |
+| --- | ---: |
+| Validation | `0.125783` |
+| Validation seen speakers | `0.101836` |
+| Validation unseen speakers | `0.135494` |
+| Test | `0.154980` |
+| Test seen speakers | `0.097115` |
+| Test unseen speakers | `0.211807` |
+
+The paper-small approximation is worse than the earlier CV baseline. The main
+difference is model capacity: the earlier run used 5 bidirectional LSTM layers
+with hidden size 1024, while the paper-small approximation uses 5 bidirectional
+GRU layers with hidden size 650. The comparison is not a clean ablation because
+the CV split also changed and the later KenLM run used stricter held-out-text
+filtering.
+
 ## Earlier Archived Run
 
 - Date: 2026-06-13

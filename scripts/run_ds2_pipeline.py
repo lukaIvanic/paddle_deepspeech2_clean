@@ -33,6 +33,7 @@ EVAL_COMPONENTS = (
     "test_seen_speakers",
     "test_unseen_speakers",
 )
+EVAL_COMPONENT_SET = set(EVAL_COMPONENTS)
 SPECIAL_VOCAB_TOKENS = {"<blank>", "<unk>", "<sos/eos>"}
 
 
@@ -625,7 +626,7 @@ def train_and_eval(
 
     from scripts.recompute_asr_metrics import compute as compute_asr_metrics
 
-    for eval_name in EVAL_COMPONENTS:
+    for eval_name in args.eval_components:
         utterances = prepared["components"][eval_name]["summary"]["utterances"]
         if utterances == 0:
             summary["evals"][eval_name] = {"skipped": True, "reason": "empty_manifest"}
@@ -739,7 +740,7 @@ def write_run_summary(run_dir: Path, run_meta: dict, eval_summary: dict) -> None
     else:
         lines.append("| Subset | Utterances | WER | CER spaces | CER no spaces | Exact |")
         lines.append("| --- | ---: | ---: | ---: | ---: | ---: |")
-        for name in EVAL_COMPONENTS:
+        for name in run_meta["eval_components"]:
             item = eval_summary["evals"].get(name)
             if not item or item.get("skipped"):
                 lines.append(f"| `{name}` | 0 | skipped | skipped | skipped | skipped |")
@@ -806,6 +807,7 @@ def run_one_split(
         "decode_config": rel_to_project(
             project_root, as_project_path(project_root, args.decode_config)
         ),
+        "eval_components": list(args.eval_components),
         "preprocess_config": rel_to_project(project_root, prepared["preprocess_path"]),
         "cmvn_path": rel_to_project(project_root, prepared["cmvn_path"]),
         "vocab_path": rel_to_project(project_root, prepared["vocab_path"]),
@@ -871,12 +873,33 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--skip-train", action="store_true")
     parser.add_argument("--skip-eval", action="store_true")
     parser.add_argument(
+        "--eval-components",
+        default=",".join(EVAL_COMPONENTS),
+        help=(
+            "Comma-separated eval components to score. Defaults to all: "
+            + ",".join(EVAL_COMPONENTS)
+        ),
+    )
+    parser.add_argument(
         "--write-utterance-metrics",
         action="store_true",
         help="Write per-utterance TSV files with refs/hyps. These are ignored by Git.",
     )
     args = parser.parse_args(argv)
     args.project_root = args.project_root.resolve()
+    args.eval_components = tuple(
+        item.strip() for item in args.eval_components.split(",") if item.strip()
+    )
+    unknown_eval_components = sorted(set(args.eval_components) - EVAL_COMPONENT_SET)
+    if unknown_eval_components:
+        raise SystemExit(
+            "Unknown --eval-components value(s): "
+            + ", ".join(unknown_eval_components)
+            + ". Valid values: "
+            + ", ".join(EVAL_COMPONENTS)
+        )
+    if not args.eval_components:
+        raise SystemExit("--eval-components must include at least one component.")
     return args
 
 
