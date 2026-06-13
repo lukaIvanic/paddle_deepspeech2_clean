@@ -1,0 +1,138 @@
+{
+  "avg_checkpoint_prefix": "results/ds2_cv_20260613_001/details/model/checkpoints/avg_1",
+  "evals": {
+    "test": {
+      "metrics": {
+        "cer_including_spaces": 0.09137666761282998,
+        "cer_no_spaces": 0.08762961495277723,
+        "char_edits_including_spaces": 8048,
+        "char_edits_no_spaces": 6634,
+        "exact_match_rate": 0.09969788519637462,
+        "exact_match_utterances": 99,
+        "macro_cer_including_spaces": 0.09095486296123487,
+        "macro_cer_no_spaces": 0.08712138880412756,
+        "macro_wer": 0.3862416526849425,
+        "num_utterances": 993,
+        "reference_chars_including_spaces": 88075,
+        "reference_chars_no_spaces": 75705,
+        "reference_words": 13363,
+        "wer": 0.3844196662426102,
+        "word_edits": 5137
+      },
+      "metrics_file": "results/ds2_cv_20260613_001/details/metrics/test.json",
+      "result_file": "results/ds2_cv_20260613_001/details/eval/test.rsl",
+      "skipped": false
+    },
+    "test_seen_speakers": {
+      "metrics": {
+        "cer_including_spaces": 0.05848803916135587,
+        "cer_no_spaces": 0.05423291098377855,
+        "char_edits_including_spaces": 2533,
+        "char_edits_no_spaces": 2016,
+        "exact_match_rate": 0.1728395061728395,
+        "exact_match_utterances": 84,
+        "macro_cer_including_spaces": 0.056274687755527866,
+        "macro_cer_no_spaces": 0.05196808580809792,
+        "macro_wer": 0.2683310904882308,
+        "num_utterances": 486,
+        "reference_chars_including_spaces": 43308,
+        "reference_chars_no_spaces": 37173,
+        "reference_words": 6621,
+        "wer": 0.28032019332427127,
+        "word_edits": 1856
+      },
+      "metrics_file": "results/ds2_cv_20260613_001/details/metrics/test_seen_speakers.json",
+      "result_file": "results/ds2_cv_20260613_001/details/eval/test_seen_speakers.rsl",
+      "skipped": false
+    },
+    "test_unseen_speakers": {
+      "metrics": {
+        "cer_including_spaces": 0.12319342372729912,
+        "cer_no_spaces": 0.11984843766220285,
+        "char_edits_including_spaces": 5515,
+        "char_edits_no_spaces": 4618,
+        "exact_match_rate": 0.029585798816568046,
+        "exact_match_utterances": 15,
+        "macro_cer_including_spaces": 0.12419858120575875,
+        "macro_cer_no_spaces": 0.12081863782990747,
+        "macro_wer": 0.49926834544155374,
+        "num_utterances": 507,
+        "reference_chars_including_spaces": 44767,
+        "reference_chars_no_spaces": 38532,
+        "reference_words": 6742,
+        "wer": 0.48665084544645504,
+        "word_edits": 3281
+      },
+      "metrics_file": "results/ds2_cv_20260613_001/details/metrics/test_unseen_speakers.json",
+      "result_file": "results/ds2_cv_20260613_001/details/eval/test_unseen_speakers.rsl",
+      "skipped": false
+    },
+    "val": {
+      "metrics": {
+        "cer_including_spaces": 0.06760684118089821,
+        "cer_no_spaces": 0.06274986329667659,
+        "char_edits_including_spaces": 6467,
+        "char_edits_no_spaces": 5164,
+        "exact_match_rate": 0.10993249758919961,
+        "exact_match_utterances": 114,
+        "macro_cer_including_spaces": 0.06379881838358077,
+        "macro_cer_no_spaces": 0.05935485874948098,
+        "macro_wer": 0.3112966324436347,
+        "num_utterances": 1037,
+        "reference_chars_including_spaces": 95656,
+        "reference_chars_no_spaces": 82295,
+        "reference_words": 14398,
+        "wer": 0.3265731351576608,
+        "word_edits": 4702
+      },
+      "metrics_file": "results/ds2_cv_20260613_001/details/metrics/val.json",
+      "result_file": "results/ds2_cv_20260613_001/details/eval/val.rsl",
+      "skipped": false
+    },
+    "val_seen_speakers": {
+      "metrics": {
+        "cer_including_spaces": 0.05528993502513179,
+        "cer_no_spaces": 0.0510894332099117,
+        "char_edits_including_spaces": 1804,
+        "char_edits_no_spaces": 1435,
+        "exact_match_rate": 0.16621253405994552,
+        "exact_match_utterances": 61,
+        "macro_cer_including_spaces": 0.051492099828132264,
+        "macro_cer_no_spaces": 0.04769170336769825,
+        "macro_wer": 0.25513989426956246,
+        "num_utterances": 367,
+        "reference_chars_including_spaces": 32628,
+        "reference_chars_no_spaces": 28088,
+        "reference_words": 4907,
+        "wer": 0.270429997962095,
+        "word_edits": 1327
+      },
+      "metrics_file": "results/ds2_cv_20260613_001/details/metrics/val_seen_speakers.json",
+      "result_file": "results/ds2_cv_20260613_001/details/eval/val_seen_speakers.rsl",
+      "skipped": false
+    },
+    "val_unseen_speakers": {
+      "metrics": {
+        "cer_including_spaces": 0.07398299168623469,
+        "cer_no_spaces": 0.06879185345066136,
+        "char_edits_including_spaces": 4663,
+        "char_edits_no_spaces": 3729,
+        "exact_match_rate": 0.0791044776119403,
+        "exact_match_utterances": 53,
+        "macro_cer_including_spaces": 0.07053770602662347,
+        "macro_cer_no_spaces": 0.06573951596669353,
+        "macro_wer": 0.34222295187795654,
+        "num_utterances": 670,
+        "reference_chars_including_spaces": 63028,
+        "reference_chars_no_spaces": 54207,
+        "reference_words": 9491,
+        "wer": 0.3557054051206406,
+        "word_edits": 3376
+      },
+      "metrics_file": "results/ds2_cv_20260613_001/details/metrics/val_unseen_speakers.json",
+      "result_file": "results/ds2_cv_20260613_001/details/eval/val_unseen_speakers.rsl",
+      "skipped": false
+    }
+  },
+  "model_dir": "results/ds2_cv_20260613_001/details/model"
+}

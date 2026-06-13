@@ -44,6 +44,8 @@ data/cross_validation_splits/*/*
 *.safetensors
 
 # Run details that include transcript text or generated data stay local.
+results/*.out
+results/*.pid
 results/**/details/decoded/
 results/**/details/eval/
 results/**/details/analysis/utterance_metrics.tsv
