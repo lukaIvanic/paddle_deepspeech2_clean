@@ -1,0 +1,110 @@
+{
+  "artifacts": {
+    "arpa": {
+      "bytes": 2413483,
+      "path": "results/paper_7gru_001_kenlm5_beam20_a2p5_b0p3/details/lm/lm.arpa",
+      "sha256": "f8a8e6f2964fdceb6b48522d0e1a848becdfbf41545c69e72bf0ad14a84001cd"
+    },
+    "binary": {
+      "bytes": 239889,
+      "path": "results/paper_7gru_001_kenlm5_beam20_a2p5_b0p3/details/lm/lm.klm",
+      "sha256": "562d1de7bab1e2eb259440e5fabb9077fd147fbff2517080bb303e85cfd0fb87"
+    },
+    "excluded_text_matches": {
+      "bytes": 246702,
+      "path": "results/paper_7gru_001_kenlm5_beam20_a2p5_b0p3/details/lm/excluded_text_matches.jsonl",
+      "sha256": "227924c00e827ef89c22487e56281ac330a34e2c626ee672c22a0978f3919767"
+    },
+    "text": {
+      "bytes": 219122,
+      "path": "results/paper_7gru_001_kenlm5_beam20_a2p5_b0p3/details/lm/train_text.txt",
+      "sha256": "16b0a3d7f9056c33d1b947fa1d584dfc8a446c94e5ed1b18263a41ce7f1fd5eb"
+    }
+  },
+  "build_binary_seconds": 0.084214,
+  "created_at_utc": "2026-06-13T17:29:09.070586+00:00",
+  "elapsed_seconds": 10.562606,
+  "finished_at_utc": "2026-06-13T17:29:19.633289+00:00",
+  "kenlm": {
+    "backoff_bits": 8,
+    "build_binary": "/workspace/kenlm_tools/build/bin/build_binary",
+    "lmplz": "/workspace/kenlm_tools/build/bin/lmplz",
+    "memory": "80%",
+    "model_type": "trie",
+    "order": 5,
+    "pointer_bits": 22,
+    "prob_bits": 8,
+    "prune": [
+      "0"
+    ]
+  },
+  "lm_text_filter": {
+    "description": "KenLM corpus excludes train rows whose normalized transcript exactly or fuzzily matches validation/test text.",
+    "empty_text_rows_kept": 0,
+    "enabled": true,
+    "exclude_manifests": [
+      {
+        "nonempty_text_rows": 1205,
+        "path": "data/cross_validation_splits/cv_paper_small_001/val.jsonl",
+        "sha256": "fdd5f5c78e24cc2a7b81b632c2878aa7864dd1389bc8933257a44f446e1feeb9",
+        "unique_texts": 1050,
+        "utterances": 1205
+      },
+      {
+        "nonempty_text_rows": 993,
+        "path": "data/test/test.jsonl",
+        "sha256": "4129467fcf9a5ebe75899e4179efa56ffce4a5e16e81d6e81ccb34e180e62a56",
+        "unique_texts": 906,
+        "utterances": 993
+      }
+    ],
+    "excluded_exact_rows": 507,
+    "excluded_fuzzy_rows": 260,
+    "excluded_rows": 767,
+    "fuzzy_threshold": 0.9,
+    "heldout_text_rows": 2198,
+    "heldout_unique_texts": 1887,
+    "length_ratio_min": 0.8,
+    "text_field": "text",
+    "train_manifest": "data/cross_validation_splits/cv_paper_small_001/train.jsonl",
+    "train_rows_after_filter": 2290,
+    "train_rows_before_filter": 3057
+  },
+  "lmplz_seconds": 10.478392,
+  "schema_version": 1,
+  "text_field": "text",
+  "text_sha256": "16b0a3d7f9056c33d1b947fa1d584dfc8a446c94e5ed1b18263a41ce7f1fd5eb",
+  "text_summary": {
+    "character_tokens_including_spaces": 211630,
+    "character_types_including_space": 28,
+    "empty_text_rows": 0,
+    "nonempty_text_lines": 2290,
+    "speaker_count": 19,
+    "speakers": {
+      "m01": 203,
+      "m02": 5,
+      "m03": 67,
+      "m05": 129,
+      "m06": 11,
+      "m07": 25,
+      "m08": 208,
+      "m09": 180,
+      "m11": 183,
+      "z01": 105,
+      "z02": 145,
+      "z03": 68,
+      "z04": 282,
+      "z05": 162,
+      "z07": 77,
+      "z09": 172,
+      "z10": 135,
+      "z11": 111,
+      "z13": 22
+    },
+    "utterances": 2290,
+    "word_tokens": 32714,
+    "word_types": 1181
+  },
+  "train_manifest": "data/cross_validation_splits/cv_paper_small_001/train.jsonl",
+  "train_manifest_sha256": "5a45512b315d04f708df0312682e4289bd5eb4b5695783eb2033bf17700a37d5"
+}

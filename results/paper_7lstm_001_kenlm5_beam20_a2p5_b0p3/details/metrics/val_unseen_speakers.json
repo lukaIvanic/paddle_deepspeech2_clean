@@ -1,0 +1,17 @@
+{
+  "cer_including_spaces": 0.07057668204313162,
+  "cer_no_spaces": 0.06795020397103761,
+  "char_edits_including_spaces": 5462,
+  "char_edits_no_spaces": 4514,
+  "exact_match_rate": 0.3364485981308411,
+  "exact_match_utterances": 288,
+  "macro_cer_including_spaces": 0.06330156594311646,
+  "macro_cer_no_spaces": 0.06146425477185332,
+  "macro_wer": 0.14458961422170502,
+  "num_utterances": 856,
+  "reference_chars_including_spaces": 77391,
+  "reference_chars_no_spaces": 66431,
+  "reference_words": 11816,
+  "wer": 0.16046039268788084,
+  "word_edits": 1896
+}
