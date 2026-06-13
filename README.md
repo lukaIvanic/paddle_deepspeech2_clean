@@ -270,6 +270,45 @@ A validation-only KenLM decode sweep for this run is recorded in
 that short sweep was `beam_size: 20`, `alpha: 2.5`, `beta: 0.3`, with
 validation WER `0.101397`.
 
+## 7-Layer GRU/LSTM Comparison
+
+After the paper-small approximation, two deeper recurrent variants were trained
+on the same `cv_paper_small_001` split to test whether adding recurrent depth
+improves recognition while staying within unmodified PaddleSpeech options.
+
+- CV split: `data/cross_validation_splits/cv_paper_small_001/`
+- Training utterances: `3057`
+- Validation utterances: `1205`
+- Frozen test utterances: `993`
+- Shared architecture: 2 convolution layers, 7 bidirectional recurrent layers,
+  hidden size 650, no fully connected layers
+- Shared features: 161-bin `fbank_kaldi` with CMVN
+- Shared training schedule: 20 epochs, batch size 32, learning rate `5e-4`,
+  exponential decay `0.93`, gradient clipping 5.0
+- No-LM decoding: CTC beam-search path with `beam_size: 1`
+- KenLM decoding: word-level 5-gram KenLM, CTC beam search, `beam_size: 20`,
+  `alpha: 2.5`, `beta: 0.3`
+
+The KenLM models are word-level, not character-level. PaddleSpeech reported the
+external scorer as `is_character_based = 0`, `max_order = 5`, and dictionary
+size `1181`, so the 5-gram model scores up to 5-word histories. The LM corpus
+was filtered before training: 2290 of 3057 training rows were kept, while 767
+rows were removed because their normalized transcript exactly or fuzzily
+matched validation or frozen-test text.
+
+| Model | Parameters | Decoder | Validation WER | Test WER | Test seen speakers | Test unseen speakers |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| 7 bidirectional GRU | `50.73M` | no LM | `0.400108` | `0.428946` | `0.324422` | `0.531593` |
+| 7 bidirectional GRU | `50.73M` | KenLM | `0.105070` | `0.141660` | `0.090470` | `0.191931` |
+| 7 bidirectional LSTM | `67.61M` | no LM | `0.514571` | `0.535434` | `0.440417` | `0.628745` |
+| 7 bidirectional LSTM | `67.61M` | KenLM | `0.144268` | `0.174736` | `0.114333` | `0.234055` |
+
+The 7-layer GRU model performed better than the 7-layer LSTM model on every
+reported validation and test subset, despite having fewer parameters. KenLM
+decoding substantially improved both models, especially on repeated
+weather-report language, but the GRU model remained the stronger acoustic model
+under the same split and decoder settings.
+
 ## Earlier Archived Run
 
 - Date: 2026-06-13
