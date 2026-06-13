@@ -222,6 +222,14 @@ def select_split(
     return full_test_speakers, test_ids, selection
 
 
+def component_meta(filename: str, rows: list[dict]) -> dict:
+    return {
+        "manifest": filename,
+        "utterance_id_sha256": sha256_text(sorted(row["utterance_id"] for row in rows)),
+        "summary": summarize(rows),
+    }
+
+
 def write_readmes(test_dir: Path, cv_root: Path) -> None:
     test_readme = """# Frozen Test Split
 
@@ -288,7 +296,7 @@ def run(args: argparse.Namespace) -> int:
         sample = "\n".join(missing_files[:20])
         raise SystemExit(f"Missing referenced source files:\n{sample}")
 
-    _, test_ids, selection = select_split(
+    full_test_speakers, test_ids, selection = select_split(
         rows=rows,
         heldout_speakers=args.heldout_speakers,
         per_speaker_ratio=args.per_speaker_test_ratio,
@@ -310,6 +318,12 @@ def run(args: argparse.Namespace) -> int:
     test_rows = [rewrite_row(row, test_raw_rel) for row in test_rows_original]
     train_val_rows = [
         rewrite_row(row, train_val_raw_rel) for row in train_val_rows_original
+    ]
+    test_unseen_rows = [
+        row for row in test_rows if row["speaker_id"] in full_test_speakers
+    ]
+    test_seen_rows = [
+        row for row in test_rows if row["speaker_id"] not in full_test_speakers
     ]
 
     source_id_hash = sha256_text(sorted(row["utterance_id"] for row in rows))
@@ -355,6 +369,25 @@ def run(args: argparse.Namespace) -> int:
         "raw_root": test_raw_rel.as_posix(),
         "utterance_id_sha256": test_id_hash,
         "summary": summarize(test_rows),
+        "component_definitions": {
+            "seen_speakers": (
+                "Same-speaker utterance holdout: 10% rounded-up utterances "
+                "from speakers that remain represented in train/validation."
+            ),
+            "unseen_speakers": (
+                "Fully held-out test speakers: all utterances from the "
+                "selected test speakers."
+            ),
+        },
+        "components": {
+            "test": component_meta("test.jsonl", test_rows),
+            "test_seen_speakers": component_meta(
+                "test_seen_speakers.jsonl", test_seen_rows
+            ),
+            "test_unseen_speakers": component_meta(
+                "test_unseen_speakers.jsonl", test_unseen_rows
+            ),
+        },
     }
     train_val_meta = {
         **meta_common,
@@ -369,6 +402,8 @@ def run(args: argparse.Namespace) -> int:
     print("Source speakers:", len(set(row["speaker_id"] for row in rows)))
     print("Held-out speakers:", ", ".join(selection["heldout_speakers"]))
     print("Frozen test utterances:", len(test_rows))
+    print("Frozen test seen-speaker utterances:", len(test_seen_rows))
+    print("Frozen test unseen-speaker utterances:", len(test_unseen_rows))
     print("Train/val source utterances:", len(train_val_rows))
     print("Source ID hash:", source_id_hash)
     print("Test ID hash:", test_id_hash)
@@ -398,6 +433,8 @@ def run(args: argparse.Namespace) -> int:
                 moved_sources.add(src)
 
     write_jsonl(test_dir / "test.jsonl", test_rows)
+    write_jsonl(test_dir / "test_seen_speakers.jsonl", test_seen_rows)
+    write_jsonl(test_dir / "test_unseen_speakers.jsonl", test_unseen_rows)
     write_json(test_dir / "test.meta.json", test_meta)
     write_jsonl(train_val_dir / "source.jsonl", train_val_rows)
     write_json(train_val_dir / "source.meta.json", train_val_meta)
@@ -430,6 +467,24 @@ def verify_outputs(
     train_val_ids = {row["utterance_id"] for row in train_val_rows}
     if test_ids & train_val_ids:
         raise SystemExit("Verification failed: overlapping utterance ids")
+
+    test_seen_path = test_dir / "test_seen_speakers.jsonl"
+    test_unseen_path = test_dir / "test_unseen_speakers.jsonl"
+    if test_seen_path.exists() and test_unseen_path.exists():
+        test_seen_rows = read_jsonl(test_seen_path)
+        test_unseen_rows = read_jsonl(test_unseen_path)
+        seen_ids = {row["utterance_id"] for row in test_seen_rows}
+        unseen_ids = {row["utterance_id"] for row in test_unseen_rows}
+        if seen_ids & unseen_ids:
+            raise SystemExit("Verification failed: overlapping test components")
+        if seen_ids | unseen_ids != test_ids:
+            raise SystemExit("Verification failed: test components do not equal test")
+        heldout = set()
+        if (test_dir / "test.meta.json").exists():
+            meta = json.loads((test_dir / "test.meta.json").read_text(encoding="utf-8"))
+            heldout = set(meta["selection"]["heldout_speakers"])
+        if heldout and {row["speaker_id"] for row in test_unseen_rows} != heldout:
+            raise SystemExit("Verification failed: test unseen speakers mismatch")
 
     test_paths: set[str] = set()
     train_val_paths: set[str] = set()

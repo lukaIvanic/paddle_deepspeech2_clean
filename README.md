@@ -118,6 +118,10 @@ Each generated CV split should keep component manifests for separate scoring:
 `train_unseen_speakers.jsonl` that verifies full validation speakers do not
 appear in training.
 
+The frozen test split also keeps component manifests for separate final scoring:
+`test_unseen_speakers.jsonl` for the fully held-out speakers and
+`test_seen_speakers.jsonl` for the same-speaker utterance holdout.
+
 | Stage | Pool | Speaker-held-out component | Same-speaker utterance component | Output |
 | --- | --- | --- | --- | --- |
 | Source corpus | Regular VEPRAD `mXX/zXX` utterances, excluding `sm04` | None | None | One-time pre-split source manifest |

@@ -1,9 +1,125 @@
 {
+  "component_definitions": {
+    "seen_speakers": "Same-speaker utterance holdout: 10% rounded-up utterances from speakers that remain represented in train/validation.",
+    "unseen_speakers": "Fully held-out test speakers: all utterances from the selected test speakers."
+  },
+  "components": {
+    "test": {
+      "manifest": "test.jsonl",
+      "summary": {
+        "corpora": {
+          "mz": 993
+        },
+        "genders": {
+          "female": 404,
+          "male": 589
+        },
+        "speaker_count": 25,
+        "speakers": {
+          "m01": 34,
+          "m02": 1,
+          "m03": 11,
+          "m04": 383,
+          "m05": 22,
+          "m06": 3,
+          "m07": 6,
+          "m08": 37,
+          "m09": 32,
+          "m10": 27,
+          "m11": 33,
+          "z01": 15,
+          "z02": 23,
+          "z03": 12,
+          "z04": 44,
+          "z05": 30,
+          "z06": 91,
+          "z07": 12,
+          "z08": 64,
+          "z09": 31,
+          "z10": 22,
+          "z11": 17,
+          "z12": 6,
+          "z13": 4,
+          "z14": 33
+        },
+        "total_hours": 1.50394,
+        "total_seconds": 5414.185183,
+        "utterances": 993
+      },
+      "utterance_id_sha256": "a6fc78016a31ceb2f15b562dcdcb48603571db0770c3cfdd6036a769b79741fc"
+    },
+    "test_seen_speakers": {
+      "manifest": "test_seen_speakers.jsonl",
+      "summary": {
+        "corpora": {
+          "mz": 486
+        },
+        "genders": {
+          "female": 280,
+          "male": 206
+        },
+        "speaker_count": 22,
+        "speakers": {
+          "m01": 34,
+          "m02": 1,
+          "m03": 11,
+          "m05": 22,
+          "m06": 3,
+          "m07": 6,
+          "m08": 37,
+          "m09": 32,
+          "m10": 27,
+          "m11": 33,
+          "z01": 15,
+          "z02": 23,
+          "z03": 12,
+          "z04": 44,
+          "z05": 30,
+          "z07": 12,
+          "z08": 64,
+          "z09": 31,
+          "z10": 22,
+          "z11": 17,
+          "z12": 6,
+          "z13": 4
+        },
+        "total_hours": 0.741424,
+        "total_seconds": 2669.124627,
+        "utterances": 486
+      },
+      "utterance_id_sha256": "3b93bbf584f2c817b60af96ac70492f38c3424452a99ce2a85161efc812bdfb4"
+    },
+    "test_unseen_speakers": {
+      "manifest": "test_unseen_speakers.jsonl",
+      "summary": {
+        "corpora": {
+          "mz": 507
+        },
+        "genders": {
+          "female": 124,
+          "male": 383
+        },
+        "speaker_count": 3,
+        "speakers": {
+          "m04": 383,
+          "z06": 91,
+          "z14": 33
+        },
+        "total_hours": 0.762517,
+        "total_seconds": 2745.060556,
+        "utterances": 507
+      },
+      "utterance_id_sha256": "bd3c3c35325db549419278798048df028a7080d255dbf89f20eac48eb1a65a67"
+    }
+  },
   "created_at_utc": "2026-06-13T13:03:29.513448+00:00",
   "dataset": "veprad",
   "excluded_data": {
     "sm04": "Excluded/quarantined before splitting because it is a segmented speech-synthesis subset of a male VEPRAD speaker and may leak speaker/content information relative to m04."
   },
+  "input_manifest": "data/manifests/veprad/source.jsonl",
+  "input_manifest_role": "one_time_pre_split_source",
+  "input_manifest_sha256": "b40bc2955e6d68c7ac322bfd4ff2b215211408a2b2efa52144c6dc7ac775fe05",
   "logical_split": "frozen_test",
   "manifest": "data/test/test.jsonl",
   "raw_root": "data/test/raw/veprad",
@@ -50,9 +166,6 @@
     "rounding": "ceil_per_speaker",
     "same_speaker_test_ratio": 0.1
   },
-  "input_manifest": "data/manifests/veprad/source.jsonl",
-  "input_manifest_role": "one_time_pre_split_source",
-  "input_manifest_sha256": "b40bc2955e6d68c7ac322bfd4ff2b215211408a2b2efa52144c6dc7ac775fe05",
   "source_summary": {
     "corpora": {
       "mz": 5255
