@@ -20,20 +20,17 @@ end to end.
 - `data/raw/veprad/`: VEPRAD audio/text corpus.
 - `data/manifests/veprad/`: canonical VEPRAD manifests and speaker-CV manifests.
 - `data/paddlespeech/`: generated PaddleSpeech raw manifests. This directory is
-  created by `local/data.sh` during stage `-1` and is not required before the
+  created by `scripts/data.sh` during stage `-1` and is not required before the
   first run.
-- `run.sh`, `path.sh`: portable recipe entrypoint files. They resolve paths
-  relative to this folder.
 - `conf/`: training, preprocessing, and decode configs.
-- `local/`: adapted PaddleSpeech recipe scripts for VEPRAD.
+- `scripts/`: adapted PaddleSpeech recipe scripts for VEPRAD plus helper
+  utilities. `scripts/run.sh` is the main recipe entrypoint.
 - `scripts/convert_project_manifests_to_paddlespeech.py`: converts bundled
   VEPRAD manifests into PaddleSpeech raw JSONL.
 - `scripts/recompute_asr_metrics.py`: independently recomputes WER/CER from a
   PaddleSpeech result file.
 - `results/paddlespeech_ds2_veprad_full_2026-06-13/`: archived completed run
   outputs, logs, configs, decoded hypotheses, metrics, and error analysis.
-- `requirements_remote.txt`: Python package pins used on the remote GPU.
-- `SHA256SUMS.txt`: checksums for the portable bundle.
 
 The checkpoint weights are not stored here. The archived results contain decoded
 outputs and logs, and the bundled recipe/data can regenerate checkpoints.
@@ -83,7 +80,7 @@ From this folder:
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip setuptools wheel
-python -m pip install -r requirements_remote.txt
+python -m pip install paddlepaddle-gpu==2.6.2 paddlespeech==1.5.0 numpy==1.26.4
 ```
 
 Verify the bundled PaddleSpeech checkout:
@@ -101,9 +98,9 @@ Expected commit:
 Then run the recipe:
 
 ```bash
-bash run.sh --stage 0 --stop_stage 0 --gpus 0
-bash run.sh --stage 1 --stop_stage 1 --gpus 0
-bash run.sh --stage 2 --stop_stage 3 --gpus 0 --avg_num 1
+bash scripts/run.sh --stage 0 --stop_stage 0 --gpus 0
+bash scripts/run.sh --stage 1 --stop_stage 1 --gpus 0
+bash scripts/run.sh --stage 2 --stop_stage 3 --gpus 0 --avg_num 1
 ```
 
 See `REMOTE_REPRODUCTION.md` for the full Vast.ai sync and result-copy workflow.
@@ -116,15 +113,15 @@ two-dimensional split protocol that separates both speakers and utterances.
 
 First, create one frozen test split and do not regenerate it during model
 selection. The test split should contain all utterances from 3 randomly selected
-speakers. From every other speaker, also add 10% of that speaker's utterances,
+speakers. From all remaining speakers, also add 10% of each speaker's utterances,
 rounded up, so speakers with very few utterances still contribute at least one
 test example. After this step, the test manifest is fixed and should not be
 changed unless the whole experiment protocol is explicitly restarted.
 
 Cross-validation runs are then sampled only from the remaining non-test data.
 For each validation run, randomly select 3 validation speakers and use all of
-their remaining utterances for validation. From each other available speaker,
-also add 10% of that speaker's remaining utterances, rounded up, to validation.
+their remaining utterances for validation. From all other available speakers,
+also add 10% of each speaker's remaining utterances, rounded up, to validation.
 All remaining utterances form the training split for that run. These validation
 folds are intentionally random per run; the frozen manifests written for a run
 are the reproducibility record rather than a hard-coded seed.
@@ -132,9 +129,9 @@ are the reproducibility record rather than a hard-coded seed.
 | Stage | Pool | Speaker-held-out component | Same-speaker utterance component | Output |
 | --- | --- | --- | --- | --- |
 | Source corpus | All normalized VEPRAD utterances | None | None | Full manifest |
-| Frozen test split | Full manifest | All utterances from 3 random speakers | 10% of utterances from every other speaker, rounded up per speaker | Fixed test manifest |
+| Frozen test split | Full manifest | All utterances from 3 random speakers | 10% of utterances from all remaining speakers, rounded up per speaker | Fixed test manifest |
 | CV input pool | Full manifest minus frozen test | Test speakers and test utterances removed | Test utterances removed from remaining speakers | Remaining pool |
-| One CV validation split | CV input pool | All remaining utterances from 3 random validation speakers | 10% of remaining utterances from every other speaker, rounded up per speaker | Validation manifest for this run |
+| One CV validation split | CV input pool | All remaining utterances from 3 random validation speakers | 10% of remaining utterances from all other available speakers, rounded up per speaker | Validation manifest for this run |
 | One CV training split | CV input pool minus validation split | Validation speakers removed for that run | Validation utterances removed from remaining speakers | Training manifest for this run |
 
 This protocol is meant to evaluate two kinds of generalization at the same
@@ -165,7 +162,9 @@ from speakers that are still represented in training.
 
 - `REMOTE_REPRODUCTION.md`: exact steps to run this folder on a remote GPU box.
 - `conf/deepspeech2.yaml`: model/training config.
-- `local/data.sh`: VEPRAD data preparation stages.
+- `scripts/data.sh`: VEPRAD data preparation stages.
+- `scripts/run.sh`: recipe driver for data preparation, training, averaging, and
+  testing.
 - `results/paddlespeech_ds2_veprad_full_2026-06-13/README.md`: archived run
   summary.
 - `results/paddlespeech_ds2_veprad_full_2026-06-13/exp/deepspeech2/checkpoints/avg_1.rsl`:
@@ -177,7 +176,7 @@ from speakers that are still represented in training.
 
 ## Important Notes
 
-The train-only vocabulary choice is intentional. `local/data.sh` builds
+The train-only vocabulary choice is intentional. `scripts/data.sh` builds
 `data/lang_char/vocab.txt` only from `data/manifest.train.raw`, so dev/test
 transcripts do not leak into the vocabulary.
 

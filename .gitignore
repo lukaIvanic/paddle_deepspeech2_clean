@@ -24,9 +24,6 @@ data/manifests/veprad/*
 data/manifests/veprad/speaker_cv/*
 !data/manifests/veprad/speaker_cv/*.meta.json
 
-# Portable-bundle checksum inventory includes local data artifacts.
-SHA256SUMS.txt
-
 # Model and checkpoint artifacts
 *.pdparams
 *.pdopt

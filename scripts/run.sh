@@ -2,8 +2,8 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "${SCRIPT_DIR}"
 source "${SCRIPT_DIR}/path.sh"
+cd "${PROJECT_ROOT}"
 
 gpus=0
 stage=0
@@ -20,12 +20,12 @@ echo "checkpoint name ${ckpt}"
 
 if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     # prepare data
-    bash ./local/data.sh || exit -1
+    bash "${SCRIPT_DIR}/data.sh" || exit -1
 fi
 
 if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     # train model, all `ckpt` under `exp` dir
-    CUDA_VISIBLE_DEVICES=${gpus} ./local/train.sh "${conf_path}" "${ckpt}" ${ips}
+    CUDA_VISIBLE_DEVICES=${gpus} "${SCRIPT_DIR}/train.sh" "${conf_path}" "${ckpt}" ${ips}
 fi
 
 if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
@@ -35,5 +35,5 @@ fi
 
 if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
     # test ckpt avg_n
-    CUDA_VISIBLE_DEVICES=${gpus} ./local/test.sh "${conf_path}" "${decode_conf_path}" "exp/${ckpt}/checkpoints/${avg_ckpt}" || exit -1
+    CUDA_VISIBLE_DEVICES=${gpus} "${SCRIPT_DIR}/test.sh" "${conf_path}" "${decode_conf_path}" "exp/${ckpt}/checkpoints/${avg_ckpt}" || exit -1
 fi

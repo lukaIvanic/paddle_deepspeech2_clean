@@ -3,8 +3,9 @@ set -e
 
 if [ -z "${PROJECT_ROOT:-}" ] || [ -z "${MAIN_ROOT:-}" ]; then
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    source "${SCRIPT_DIR}/../path.sh"
+    source "${SCRIPT_DIR}/path.sh"
 fi
+cd "${PROJECT_ROOT}"
 
 stage=-1
 stop_stage=100

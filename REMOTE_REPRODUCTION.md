@@ -69,11 +69,19 @@ cd "$BASE/paddle_deepspeech2_clean"
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip setuptools wheel
-python -m pip install -r requirements_remote.txt
+python -m pip install paddlepaddle-gpu==2.6.2 paddlespeech==1.5.0 numpy==1.26.4
 ```
 
 NumPy `1.26.4` is intentional. PaddleSpeech `1.5.0` imports APIs that are
 removed in NumPy 2.x.
+
+The required remote Python packages for the completed run were:
+
+```text
+paddlepaddle-gpu==2.6.2
+paddlespeech==1.5.0
+numpy==1.26.4
+```
 
 ## 4. Verify The Bundled PaddleSpeech Checkout
 
@@ -99,9 +107,9 @@ cd "$BASE/paddle_deepspeech2_clean"
 . .venv/bin/activate
 export PATH="$PWD/.venv/bin:$PATH"
 
-bash run.sh --stage 0 --stop_stage 0 --gpus 0
-bash run.sh --stage 1 --stop_stage 1 --gpus 0
-bash run.sh --stage 2 --stop_stage 3 --gpus 0 --avg_num 1
+bash scripts/run.sh --stage 0 --stop_stage 0 --gpus 0
+bash scripts/run.sh --stage 1 --stop_stage 1 --gpus 0
+bash scripts/run.sh --stage 2 --stop_stage 3 --gpus 0 --avg_num 1
 ```
 
 The completed run took about 15 minutes for training on an RTX 3090. The best
