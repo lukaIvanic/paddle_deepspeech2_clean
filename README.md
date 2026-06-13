@@ -108,6 +108,39 @@ bash run.sh --stage 2 --stop_stage 3 --gpus 0 --avg_num 1
 
 See `REMOTE_REPRODUCTION.md` for the full Vast.ai sync and result-copy workflow.
 
+## Planned Dataset Split Pipeline
+
+The archived baseline below used the existing VEPRAD manifests copied from the
+earlier project. For the next reproducible experiment series, use a stricter
+two-dimensional split protocol that separates both speakers and utterances.
+
+First, create one frozen test split and do not regenerate it during model
+selection. The test split should contain all utterances from 3 randomly selected
+speakers. From every other speaker, also add 10% of that speaker's utterances,
+rounded up, so speakers with very few utterances still contribute at least one
+test example. After this step, the test manifest is fixed and should not be
+changed unless the whole experiment protocol is explicitly restarted.
+
+Cross-validation runs are then sampled only from the remaining non-test data.
+For each validation run, randomly select 3 validation speakers and use all of
+their remaining utterances for validation. From each other available speaker,
+also add 10% of that speaker's remaining utterances, rounded up, to validation.
+All remaining utterances form the training split for that run. These validation
+folds are intentionally random per run; the frozen manifests written for a run
+are the reproducibility record rather than a hard-coded seed.
+
+| Stage | Pool | Speaker-held-out component | Same-speaker utterance component | Output |
+| --- | --- | --- | --- | --- |
+| Source corpus | All normalized VEPRAD utterances | None | None | Full manifest |
+| Frozen test split | Full manifest | All utterances from 3 random speakers | 10% of utterances from every other speaker, rounded up per speaker | Fixed test manifest |
+| CV input pool | Full manifest minus frozen test | Test speakers and test utterances removed | Test utterances removed from remaining speakers | Remaining pool |
+| One CV validation split | CV input pool | All remaining utterances from 3 random validation speakers | 10% of remaining utterances from every other speaker, rounded up per speaker | Validation manifest for this run |
+| One CV training split | CV input pool minus validation split | Validation speakers removed for that run | Validation utterances removed from remaining speakers | Training manifest for this run |
+
+This protocol is meant to evaluate two kinds of generalization at the same
+time: performance on unseen speakers and performance on held-out utterances
+from speakers that are still represented in training.
+
 ## Completed Run
 
 - Date: 2026-06-13
