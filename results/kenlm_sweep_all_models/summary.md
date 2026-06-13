@@ -10,6 +10,11 @@ transcripts. Each acoustic model was decoded with the same grid:
 - `beam=20`, `beta=0.3`, `alpha=2.0` and `alpha=3.0`
 - `beam=20`, `alpha=2.5`, `beta=0.0` and `beta=0.6`
 
+The full machine-readable sweep output is stored in `metrics.json` in this
+folder. It contains every candidate, every evaluated subset, and the full metric
+objects (`wer`, CER variants, exact-match rate, utterance counts, and edit
+counts).
+
 ## Best Validation Rows
 
 | Model | Params | Best validation setting | Val WER | Test WER | Test seen WER | Test unseen WER |

@@ -340,6 +340,7 @@ than unseen-speaker subsets across all models.
 Detailed sweep tables are tracked in:
 
 - `results/kenlm_sweep_all_models/summary.md`
+- `results/kenlm_sweep_all_models/metrics.json`
 - `results/paper_small_001_kenlm_sweep_all/summary.md`
 - `results/paper_7gru_001_kenlm_sweep_all/summary.md`
 - `results/paper_7lstm_001_kenlm_sweep_all/summary.md`
@@ -382,8 +383,12 @@ Detailed sweep tables are tracked in:
   parsed epoch/dev-loss curve.
 - `results/paper_small_001_kenlm_sweep_val/summary.md`: validation-only KenLM
   decode sweep for the paper-small run.
+- `results/paper_small_001_kenlm_sweep_val/metrics.json`: machine-readable
+  metrics for the validation-only paper-small KenLM sweep.
 - `results/kenlm_sweep_all_models/summary.md`: shared all-subset KenLM decoder
   sweep comparison across the paper-small, 7-layer GRU, and 7-layer LSTM runs.
+- `results/kenlm_sweep_all_models/metrics.json`: machine-readable metrics for
+  every candidate in the shared all-model KenLM sweep.
 - `results/paper_small_001_kenlm_sweep_all/summary.md`,
   `results/paper_7gru_001_kenlm_sweep_all/summary.md`, and
   `results/paper_7lstm_001_kenlm_sweep_all/summary.md`: per-model all-subset

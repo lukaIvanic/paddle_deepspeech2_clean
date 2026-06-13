@@ -7,6 +7,9 @@ The sweep reused the acoustic checkpoint from `paper_small_001_nolm_beam1`
 `paper_small_001_kenlm5_beam10`. Only the full validation set was decoded, so
 the frozen test set was not used for hyperparameter selection.
 
+The full machine-readable validation sweep output is stored in `metrics.json`
+in this folder.
+
 ## Fixed Settings
 
 - Split: `cv_paper_small_001`

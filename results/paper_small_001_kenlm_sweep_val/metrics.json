@@ -1,0 +1,263 @@
+{
+  "best_by_val_wer": {
+    "decoder": {
+      "alpha": 2.5,
+      "beam_size": 20,
+      "beta": 0.3,
+      "cutoff_prob": 1.0,
+      "cutoff_top_n": 40,
+      "decoding_method": "ctc_beam_search",
+      "num_proc_bsearch": 1
+    },
+    "run_name": "paper_small_001_sweep_val_b20_a2p5_bt0p3",
+    "val_wer": 0.10139691714836223
+  },
+  "candidates": [
+    {
+      "approx_seconds": null,
+      "decoder": {
+        "alpha": 2.5,
+        "beam_size": 20,
+        "beta": 0.3,
+        "cutoff_prob": 1.0,
+        "cutoff_top_n": 40,
+        "decoding_method": "ctc_beam_search",
+        "num_proc_bsearch": 1
+      },
+      "metrics": {
+        "val": {
+          "cer_including_spaces": 0.04036472709874499,
+          "cer_no_spaces": 0.03859306825612933,
+          "char_edits_including_spaces": 4387,
+          "char_edits_no_spaces": 3600,
+          "exact_match_rate": 0.4473029045643154,
+          "exact_match_utterances": 539,
+          "macro_cer_including_spaces": 0.038207005681303995,
+          "macro_cer_no_spaces": 0.03691984199402019,
+          "macro_wer": 0.09691511359508885,
+          "num_utterances": 1205,
+          "reference_chars_including_spaces": 108684,
+          "reference_chars_no_spaces": 93281,
+          "reference_words": 16608,
+          "wer": 0.10139691714836223,
+          "word_edits": 1684
+        }
+      },
+      "run_folder_remote": "results/paper_small_001_sweep_val_b20_a2p5_bt0p3",
+      "run_name": "paper_small_001_sweep_val_b20_a2p5_bt0p3"
+    },
+    {
+      "approx_seconds": null,
+      "decoder": {
+        "alpha": 1.5,
+        "beam_size": 10,
+        "beta": 0.3,
+        "cutoff_prob": 1.0,
+        "cutoff_top_n": 40,
+        "decoding_method": "ctc_beam_search",
+        "num_proc_bsearch": 1
+      },
+      "metrics": {
+        "val": {
+          "cer_including_spaces": 0.048065952670126234,
+          "cer_no_spaces": 0.046826256150770254,
+          "char_edits_including_spaces": 5224,
+          "char_edits_no_spaces": 4368,
+          "exact_match_rate": 0.4157676348547718,
+          "exact_match_utterances": 501,
+          "macro_cer_including_spaces": 0.0453152286446837,
+          "macro_cer_no_spaces": 0.04451049136862353,
+          "macro_wer": 0.11226797548748696,
+          "num_utterances": 1205,
+          "reference_chars_including_spaces": 108684,
+          "reference_chars_no_spaces": 93281,
+          "reference_words": 16608,
+          "wer": 0.11813583815028902,
+          "word_edits": 1962
+        }
+      },
+      "run_folder_remote": "results/paper_small_001_sweep_val_b10_a1p5_bt0p3",
+      "run_name": "paper_small_001_sweep_val_b10_a1p5_bt0p3"
+    },
+    {
+      "approx_seconds": null,
+      "decoder": {
+        "alpha": 2.5,
+        "beam_size": 10,
+        "beta": 0.6,
+        "cutoff_prob": 1.0,
+        "cutoff_top_n": 40,
+        "decoding_method": "ctc_beam_search",
+        "num_proc_bsearch": 1
+      },
+      "metrics": {
+        "val": {
+          "cer_including_spaces": 0.05438703028964705,
+          "cer_no_spaces": 0.05258305549897621,
+          "char_edits_including_spaces": 5911,
+          "char_edits_no_spaces": 4905,
+          "exact_match_rate": 0.41244813278008297,
+          "exact_match_utterances": 497,
+          "macro_cer_including_spaces": 0.05133246091251239,
+          "macro_cer_no_spaces": 0.050103878714615954,
+          "macro_wer": 0.11564830037863238,
+          "num_utterances": 1205,
+          "reference_chars_including_spaces": 108684,
+          "reference_chars_no_spaces": 93281,
+          "reference_words": 16608,
+          "wer": 0.12223025048169557,
+          "word_edits": 2030
+        }
+      },
+      "run_folder_remote": "results/paper_small_001_sweep_val_b10_a2p5_bt0p6",
+      "run_name": "paper_small_001_sweep_val_b10_a2p5_bt0p6"
+    },
+    {
+      "approx_seconds": null,
+      "decoder": {
+        "alpha": 2.5,
+        "beam_size": 10,
+        "beta": 0.3,
+        "cutoff_prob": 1.0,
+        "cutoff_top_n": 40,
+        "decoding_method": "ctc_beam_search",
+        "num_proc_bsearch": 1
+      },
+      "metrics": {
+        "val": {
+          "cer_including_spaces": 0.05670567884877259,
+          "cer_no_spaces": 0.05469495395632551,
+          "char_edits_including_spaces": 6163,
+          "char_edits_no_spaces": 5102,
+          "exact_match_rate": 0.408298755186722,
+          "exact_match_utterances": 492,
+          "macro_cer_including_spaces": 0.05333971422645611,
+          "macro_cer_no_spaces": 0.0519090520505506,
+          "macro_wer": 0.11871529622320423,
+          "num_utterances": 1205,
+          "reference_chars_including_spaces": 108684,
+          "reference_chars_no_spaces": 93281,
+          "reference_words": 16608,
+          "wer": 0.12578275529865124,
+          "word_edits": 2089
+        }
+      },
+      "run_folder_remote": "results/paper_small_001_kenlm5_beam10",
+      "run_name": "paper_small_001_kenlm5_beam10"
+    },
+    {
+      "approx_seconds": null,
+      "decoder": {
+        "alpha": 2.5,
+        "beam_size": 10,
+        "beta": 0.0,
+        "cutoff_prob": 1.0,
+        "cutoff_top_n": 40,
+        "decoding_method": "ctc_beam_search",
+        "num_proc_bsearch": 1
+      },
+      "metrics": {
+        "val": {
+          "cer_including_spaces": 0.059097935298664014,
+          "cer_no_spaces": 0.056742530633247926,
+          "char_edits_including_spaces": 6423,
+          "char_edits_no_spaces": 5293,
+          "exact_match_rate": 0.4033195020746888,
+          "exact_match_utterances": 486,
+          "macro_cer_including_spaces": 0.05527547164966915,
+          "macro_cer_no_spaces": 0.0535863406288872,
+          "macro_wer": 0.12178661981779036,
+          "num_utterances": 1205,
+          "reference_chars_including_spaces": 108684,
+          "reference_chars_no_spaces": 93281,
+          "reference_words": 16608,
+          "wer": 0.12969653179190752,
+          "word_edits": 2154
+        }
+      },
+      "run_folder_remote": "results/paper_small_001_sweep_val_b10_a2p5_bt0p0",
+      "run_name": "paper_small_001_sweep_val_b10_a2p5_bt0p0"
+    },
+    {
+      "approx_seconds": null,
+      "decoder": {
+        "alpha": 3.5,
+        "beam_size": 10,
+        "beta": 0.3,
+        "cutoff_prob": 1.0,
+        "cutoff_top_n": 40,
+        "decoding_method": "ctc_beam_search",
+        "num_proc_bsearch": 1
+      },
+      "metrics": {
+        "val": {
+          "cer_including_spaces": 0.07302822862610872,
+          "cer_no_spaces": 0.0697891317631672,
+          "char_edits_including_spaces": 7937,
+          "char_edits_no_spaces": 6510,
+          "exact_match_rate": 0.3759336099585062,
+          "exact_match_utterances": 453,
+          "macro_cer_including_spaces": 0.06819320609192606,
+          "macro_cer_no_spaces": 0.06570686392569275,
+          "macro_wer": 0.14216886224884365,
+          "num_utterances": 1205,
+          "reference_chars_including_spaces": 108684,
+          "reference_chars_no_spaces": 93281,
+          "reference_words": 16608,
+          "wer": 0.1514330443159923,
+          "word_edits": 2515
+        }
+      },
+      "run_folder_remote": "results/paper_small_001_sweep_val_b10_a3p5_bt0p3",
+      "run_name": "paper_small_001_sweep_val_b10_a3p5_bt0p3"
+    },
+    {
+      "approx_seconds": null,
+      "decoder": {
+        "alpha": 2.5,
+        "beam_size": 5,
+        "beta": 0.3,
+        "cutoff_prob": 1.0,
+        "cutoff_top_n": 40,
+        "decoding_method": "ctc_beam_search",
+        "num_proc_bsearch": 1
+      },
+      "metrics": {
+        "val": {
+          "cer_including_spaces": 0.09194545655294248,
+          "cer_no_spaces": 0.08913926737492094,
+          "char_edits_including_spaces": 9993,
+          "char_edits_no_spaces": 8315,
+          "exact_match_rate": 0.33112033195020746,
+          "exact_match_utterances": 399,
+          "macro_cer_including_spaces": 0.08640130500776709,
+          "macro_cer_no_spaces": 0.08423053518178589,
+          "macro_wer": 0.167114833255367,
+          "num_utterances": 1205,
+          "reference_chars_including_spaces": 108684,
+          "reference_chars_no_spaces": 93281,
+          "reference_words": 16608,
+          "wer": 0.1773843930635838,
+          "word_edits": 2946
+        }
+      },
+      "run_folder_remote": "results/paper_small_001_sweep_val_b05_a2p5_bt0p3",
+      "run_name": "paper_small_001_sweep_val_b05_a2p5_bt0p3"
+    }
+  ],
+  "description": "Validation-only KenLM decoder-parameter sweep for paper_small_001.",
+  "eval_subsets": [
+    "val"
+  ],
+  "generated_at_utc": "2026-06-13T19:58:12+00:00",
+  "generated_from": "remote generated run folders under /workspace/rogj_paddlespeech_ds2_clean/paddle_deepspeech2_clean/results",
+  "model": {
+    "acoustic_checkpoint": "results/paper_small_001_nolm_beam1/details/model/checkpoints/avg_1",
+    "id": "paper_small_001",
+    "kenlm": "results/paper_small_001_kenlm5_beam10/details/lm/lm.klm",
+    "label": "paper-small 5-layer GRU",
+    "params": "36.21M"
+  },
+  "schema_version": 1,
+  "split_id": "cv_paper_small_001"
+}
