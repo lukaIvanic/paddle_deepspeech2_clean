@@ -41,38 +41,10 @@ Use a Linux GPU machine with CUDA-compatible PaddlePaddle support. The successfu
 run used Python `3.10.14`, PaddlePaddle `2.6.2`, PaddleSpeech `1.5.0`, NumPy
 `1.26.4`, and an RTX 3090.
 
-## Current Vast.ai Box
+## Current Remote Server
 
-The current PaddleSpeech/DeepSpeech2 box is:
-
-- Vast.ai instance: `40802979`
-- Label: `rogj-paddlespeech-ds2`
-- GPU: RTX 3090
-- Status at last check: running
-- SSH host: `ssh1.vast.ai`
-- SSH port: `12978`
-- SSH key: `~/.ssh/vast_sentiment_ed25519`
-
-Connect with either:
-
-```bash
-ssh -p 12978 -i ~/.ssh/vast_sentiment_ed25519 root@ssh1.vast.ai
-```
-
-or, from this Mac after `~/.ssh/config` is up to date:
-
-```bash
-ssh vast_rogj_asr
-```
-
-The host/port can change if the instance is destroyed and recreated. Check the
-current values with:
-
-```bash
-~/.local/share/codex-vastai/bin/vastai show instances --raw
-```
-
-Look for the instance labeled `rogj-paddlespeech-ds2`.
+The current GPU box and Python environment notes are in `REMOTE_SERVER.md`.
+Code updates should go through the public Git repository.
 
 From this folder:
 
@@ -102,8 +74,6 @@ bash scripts/run.sh --stage 0 --stop_stage 0 --gpus 0
 bash scripts/run.sh --stage 1 --stop_stage 1 --gpus 0
 bash scripts/run.sh --stage 2 --stop_stage 3 --gpus 0 --avg_num 1
 ```
-
-See `REMOTE_REPRODUCTION.md` for the full Vast.ai sync and result-copy workflow.
 
 ## Planned Dataset Split Pipeline
 
@@ -160,7 +130,7 @@ from speakers that are still represented in training.
 
 ## Main Files To Read
 
-- `REMOTE_REPRODUCTION.md`: exact steps to run this folder on a remote GPU box.
+- `REMOTE_SERVER.md`: current remote GPU access and Python environment notes.
 - `conf/deepspeech2.yaml`: model/training config.
 - `scripts/data.sh`: VEPRAD data preparation stages.
 - `scripts/run.sh`: recipe driver for data preparation, training, averaging, and
