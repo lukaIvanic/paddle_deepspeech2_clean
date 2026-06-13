@@ -392,6 +392,9 @@ def prepare_paddlespeech_data(
     cmvn_path = data_dir / "mean_std.json"
     preprocess_path = data_dir / "preprocess.yaml"
 
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    formatted_dir.mkdir(parents=True, exist_ok=True)
+
     project_manifests = component_project_manifests(project_root, split_dir)
     for name, path in project_manifests.items():
         if not path.exists():
@@ -447,6 +450,7 @@ def prepare_paddlespeech_data(
             write_text(formatted_manifests[name], "")
             continue
         print(f"Formatting {name} manifest...")
+        formatted_manifests[name].parent.mkdir(parents=True, exist_ok=True)
         format_data(
             manifest_paths=[rel_to_project(project_root, raw_path)],
             output_path=rel_to_project(project_root, formatted_manifests[name]),
