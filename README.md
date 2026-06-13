@@ -35,10 +35,14 @@ end to end.
   PaddleSpeech manifests/vocabulary/CMVN, trains DeepSpeech2 by directly
   calling PaddleSpeech Python entrypoints, averages the checkpoint, and
   evaluates validation/test seen/unseen subsets.
+- `scripts/train_kenlm_lm.py`: trains a run-owned KenLM n-gram language model
+  from a single train-only JSONL manifest.
 - `scripts/recompute_asr_metrics.py`: independently recomputes WER/CER from a
   PaddleSpeech result file.
+- `results/ds2_cv_20260613_001/`: current clean CV baseline with separate
+  validation/test seen-speaker and unseen-speaker evaluations.
 - `results/2026-06-13_ds2_baseline_veprad/`: completed baseline run summary
-  and tracked supporting details.
+  and tracked supporting details from the earlier pre-CV baseline.
 
 The checkpoint weights are not stored here. Public result folders keep summaries,
 configs, metrics, and logs; local ignored details may contain decoded outputs.
@@ -92,6 +96,23 @@ If `--split-dir` is omitted, the script creates a fresh random CV split from
 model, generated PaddleSpeech files, logs, metrics, and run summary under
 `results/<run-name>/`. It calls PaddleSpeech Python functions directly.
 
+The KenLM stage can be tested or run separately once `lmplz` and `build_binary`
+are available on `PATH`:
+
+```bash
+python scripts/train_kenlm_lm.py \
+  --train-manifest data/cross_validation_splits/cv_20260613_001/train.jsonl \
+  --output-dir results/<run-name>/details/lm
+```
+
+For a CV `train.jsonl`, the KenLM script automatically filters the LM corpus
+against the sibling `val.jsonl` and frozen `data/test/test.jsonl`. Train rows
+whose normalized transcript exactly matches, or fuzzily matches at `>= 0.90`,
+held-out validation/test text are excluded from `train_text.txt` before KenLM is
+built. The removed rows are written to the ignored
+`excluded_text_matches.jsonl` audit file, and aggregate counts are recorded in
+`lm.meta.json`.
+
 ## Dataset Split Pipeline
 
 The archived baseline below used the existing VEPRAD manifests copied from the
@@ -141,7 +162,44 @@ This protocol is meant to evaluate two kinds of generalization at the same
 time: performance on unseen speakers and performance on held-out utterances
 from speakers that are still represented in training.
 
-## Completed Run
+## Transcript Targets
+
+VEPRAD transcripts include non-speech/event annotations such as `<uzdah>` and
+`<sil>`. The local project manifests keep the original transcript in `text_raw`
+and keep extracted annotations in `non_speech_events`, but the ASR target field
+`text` removes these event tags before PaddleSpeech training and evaluation.
+
+This is intentional. The current PaddleSpeech DeepSpeech2 setup uses
+character-level CTC targets (`unit_type: char`). In that mode, PaddleSpeech
+tokenizes text as individual characters, so an annotation like `<uzdah>` would
+be learned as the character sequence `<`, `u`, `z`, `d`, `a`, `h`, `>` rather
+than as one acoustic event label. Word-level or subword targets could represent
+the event as a single token, and a custom tokenizer could also be written, but
+those approaches would move this run away from the intended character-level
+DeepSpeech2 baseline and add extra decoding/metric complexity. Therefore
+non-speech annotations are excluded from the ASR targets while remaining
+auditable in metadata.
+
+## Current CV Baseline
+
+- Date: 2026-06-13
+- Run folder: `results/ds2_cv_20260613_001/`
+- CV split: `data/cross_validation_splits/cv_20260613_001/`
+- Training utterances: `3225`
+- Validation utterances: `1037`
+- Frozen test utterances: `993`
+- Model: official PaddleSpeech `DeepSpeech2Model`
+- Architecture: 2 convolution layers, 5 bidirectional LSTM layers, hidden size 1024
+- Features: 161-bin fbank with CMVN
+- Decoder: CTC beam search path, `beam_size: 1`, no external LM
+- Validation WER: `0.326573`
+- Validation seen-speaker WER: `0.270430`
+- Validation unseen-speaker WER: `0.355705`
+- Test WER: `0.384420`
+- Test seen-speaker WER: `0.280320`
+- Test unseen-speaker WER: `0.486651`
+
+## Earlier Archived Run
 
 - Date: 2026-06-13
 - Original remote workdir: `/workspace/rogj_paddlespeech_ds2`
@@ -165,6 +223,8 @@ from speakers that are still represented in training.
 
 - `REMOTE_SERVER.md`: current remote GPU access and Python environment notes.
 - `conf/deepspeech2.yaml`: model/training config.
+- `conf/deepspeech2_paper_small.yaml`: paper-small approximation config using
+  unmodified PaddleSpeech DS2 options.
 - `data/test/test.meta.json`: frozen test split audit metadata.
 - `data/cross_validation_splits/raw_train_val/source.meta.json`: non-test
   train/validation source pool audit metadata.
@@ -185,6 +245,22 @@ and test transcripts do not leak into the vocabulary.
 The preprocessing config has no augmentation. This avoids applying train-time
 SpecAugment-style transforms to dev/test through the shared PaddleSpeech
 preprocessing path.
+
+KenLM language models are treated as run-owned artifacts. Train them from the
+current run's `train.jsonl` only, after filtering out train transcripts that
+exactly or fuzzily match the current validation split or frozen test set. Store
+the LM under `results/<run>/details/lm/`, and do not reuse it across different
+CV splits. The generated text corpus, ARPA file, binary LM, match audit, and
+logs are ignored by Git; the small `lm.meta.json` audit file may be tracked for
+completed runs.
+
+The first LM diagnostic showed that exact or near-exact transcript repetition is
+present in VEPRAD because many weather-report sentences recur. Filtering eval
+utterances after decoding changed the LM-assisted test WER only modestly
+(`0.121155` unfiltered, `0.131239` after exact-match removal, `0.132189` after
+`>= 0.90` fuzzy-match removal), but future KenLM models avoid this text leakage
+at training time by filtering the LM corpus instead of deleting validation/test
+examples.
 
 The pipeline uses relative paths from this folder. It should not depend on the
 old `Projekt - DeepSpeech2` location or a hardcoded `/workspace` path.

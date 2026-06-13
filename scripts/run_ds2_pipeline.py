@@ -759,6 +759,7 @@ def write_run_summary(run_dir: Path, run_meta: dict, eval_summary: dict) -> None
             "## Notes",
             "",
             "- The pipeline calls PaddleSpeech Python functions directly; it does not shell out through the old recipe scripts.",
+            "- Training and evaluation use the normalized transcript `text` field. Non-speech/event tags remain auditable in local `text_raw` and `non_speech_events` metadata, but PaddleSpeech DeepSpeech2 character mode would split tags such as `<uzdah>` into characters instead of learning them as one acoustic event token.",
             "- Per-utterance decode files and generated PaddleSpeech manifests are local artifacts and are ignored by Git.",
             "",
         ]

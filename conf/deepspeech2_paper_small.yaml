@@ -1,0 +1,73 @@
+# DeepSpeech2 paper-small approximation within unmodified PaddleSpeech limits.
+#
+# Differences from the Deep Speech 2 paper that are intentional here:
+# - PaddleSpeech's DS2 trainer hardcodes Adam + exponential LR decay.
+# - BatchNorm and the paper's exact convolution geometry are not exposed.
+# - We keep fbank_kaldi because PaddleSpeech's plain spectrogram transform returns
+#   magnitude rather than the desired log-style features.
+###########################################
+#                   Data                  #
+###########################################
+train_manifest: data/manifest.train
+dev_manifest: data/manifest.dev
+test_manifest: data/manifest.test
+min_input_len: 0.0
+max_input_len: 30.0
+min_output_len: 0.0
+max_output_len: 400.0
+min_output_input_ratio: 0.05
+max_output_input_ratio: 10.0
+
+
+###########################################
+#              Dataloader                 #
+###########################################
+vocab_filepath: data/lang_char/vocab.txt
+spm_model_prefix: ''
+unit_type: 'char'
+preprocess_config: conf/preprocess.yaml
+feat_dim: 161
+stride_ms: 10.0
+window_ms: 25.0
+sortagrad: 0
+batch_size: 32
+maxlen_in: 512
+maxlen_out: 150
+minibatches: 0
+batch_count: auto
+batch_bins: 0
+batch_frames_in: 0
+batch_frames_out: 0
+batch_frames_inout: 0
+num_workers: 8
+subsampling_factor: 1
+num_encs: 1
+
+
+############################################
+#           Network Architecture           #
+############################################
+num_conv_layers: 2
+num_rnn_layers: 5
+rnn_layer_size: 650
+rnn_direction: bidirect
+num_fc_layers: 0
+fc_layers_size_list: -1,
+use_gru: True
+blank_id: 0
+
+
+###########################################
+#                Training                 #
+###########################################
+n_epoch: 20
+accum_grad: 1
+lr: 5.0e-4
+lr_decay: 0.93
+weight_decay: 1.0e-6
+global_grad_clip: 5.0
+dist_sampler: False
+log_interval: 20
+checkpoint:
+  kbest_n: 10
+  latest_n: 5

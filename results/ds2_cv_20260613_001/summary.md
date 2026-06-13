@@ -39,5 +39,6 @@ DeepSpeech2 VEPRAD pipeline run.
 ## Notes
 
 - The pipeline calls PaddleSpeech Python functions directly; it does not shell out through the old recipe scripts.
+- Training and evaluation use normalized transcript text with non-speech/event tags removed. The original `text_raw` and extracted `non_speech_events` metadata are preserved in the local manifests, but PaddleSpeech DeepSpeech2 character mode would split tags such as `<uzdah>` into characters instead of learning them as one acoustic event token.
 - Training completed on the remote GPU first; evaluation was resumed with `--skip-train --reuse-run-dir` after fixing eval-output directory creation in the wrapper.
 - Per-utterance decode files and generated PaddleSpeech manifests are local artifacts and are ignored by Git.

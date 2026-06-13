@@ -153,6 +153,17 @@ cd "$PROJECT"
 export PATH="$PWD/.venv/bin:$PATH"
 ```
 
+KenLM tools for language-model experiments have been built outside the project
+checkout at:
+
+```bash
+/workspace/kenlm_tools/build/bin/lmplz
+/workspace/kenlm_tools/build/bin/build_binary
+```
+
+They are used to train run-local n-gram LMs from the current run's `train.jsonl`
+only.
+
 The package versions used for the completed run were:
 
 ```text
