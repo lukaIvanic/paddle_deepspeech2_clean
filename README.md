@@ -31,6 +31,8 @@ end to end.
   utilities. `scripts/run.sh` is the main recipe entrypoint.
 - `scripts/create_frozen_test_split.py`: one-time script that physically
   separated the frozen test split from the train/validation source pool.
+- `scripts/create_cv_split.py`: creates one train/validation split from
+  `data/cross_validation_splits/raw_train_val/source.jsonl`.
 - `scripts/convert_project_manifests_to_paddlespeech.py`: converts bundled
   VEPRAD manifests into PaddleSpeech raw JSONL.
 - `scripts/recompute_asr_metrics.py`: independently recomputes WER/CER from a
@@ -109,6 +111,12 @@ utterances, rounded up, to validation. All remaining utterances form the
 training split for that run. These validation folds are intentionally random per
 run; the frozen manifests written for a run are the reproducibility record
 rather than a hard-coded seed.
+
+Each generated CV split should keep component manifests for separate scoring:
+`val_unseen_speakers.jsonl`, `val_seen_speakers.jsonl`,
+`train_seen_speakers.jsonl`, and an intentionally empty
+`train_unseen_speakers.jsonl` that verifies full validation speakers do not
+appear in training.
 
 | Stage | Pool | Speaker-held-out component | Same-speaker utterance component | Output |
 | --- | --- | --- | --- | --- |
