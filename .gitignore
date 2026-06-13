@@ -48,6 +48,8 @@ results/*.out
 results/*.pid
 results/**/details/decoded/
 results/**/details/eval/
+results/**/details/logs/
+results/**/details/model/
 results/**/details/analysis/utterance_metrics.tsv
 results/**/details/analysis/top_30_errors.md
 results/**/details/analysis/*.tsv
