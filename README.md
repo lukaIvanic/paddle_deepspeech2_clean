@@ -265,6 +265,11 @@ GRU layers with hidden size 650. The comparison is not a clean ablation because
 the CV split also changed and the later KenLM run used stricter held-out-text
 filtering.
 
+A validation-only KenLM decode sweep for this run is recorded in
+`results/paper_small_001_kenlm_sweep_val/summary.md`. The best candidate in
+that short sweep was `beam_size: 20`, `alpha: 2.5`, `beta: 0.3`, with
+validation WER `0.101397`.
+
 ## Earlier Archived Run
 
 - Date: 2026-06-13
@@ -301,6 +306,8 @@ filtering.
   independent metric calculation.
 - `results/2026-06-13_ds2_baseline_veprad/details/training_curve.tsv`:
   parsed epoch/dev-loss curve.
+- `results/paper_small_001_kenlm_sweep_val/summary.md`: validation-only KenLM
+  decode sweep for the paper-small run.
 
 ## Important Notes
 
