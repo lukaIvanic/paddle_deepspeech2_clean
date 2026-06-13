@@ -1,0 +1,281 @@
+{
+  "component_definitions": {
+    "seen_speakers": "Speakers represented in both train and validation. Their validation rows are the per-speaker 10% utterance holdout.",
+    "unseen_speakers": "Validation speakers held out completely from train. train_unseen_speakers.jsonl is intentionally empty."
+  },
+  "components": {
+    "train": {
+      "manifest": "train.jsonl",
+      "summary": {
+        "corpora": {
+          "mz": 3057
+        },
+        "genders": {
+          "female": 1652,
+          "male": 1405
+        },
+        "speaker_count": 19,
+        "speakers": {
+          "m01": 270,
+          "m02": 5,
+          "m03": 81,
+          "m05": 171,
+          "m06": 20,
+          "m07": 44,
+          "m08": 296,
+          "m09": 254,
+          "m11": 264,
+          "z01": 117,
+          "z02": 178,
+          "z03": 96,
+          "z04": 353,
+          "z05": 239,
+          "z07": 94,
+          "z09": 243,
+          "z10": 172,
+          "z11": 135,
+          "z13": 25
+        },
+        "total_hours": 4.722465,
+        "total_seconds": 17000.874112,
+        "utterances": 3057
+      },
+      "utterance_id_sha256": "54c39fd2f6b78966d84935b3172961560c408357d074ce87a88d3590ce39c134"
+    },
+    "train_seen_speakers": {
+      "manifest": "train_seen_speakers.jsonl",
+      "summary": {
+        "corpora": {
+          "mz": 3057
+        },
+        "genders": {
+          "female": 1652,
+          "male": 1405
+        },
+        "speaker_count": 19,
+        "speakers": {
+          "m01": 270,
+          "m02": 5,
+          "m03": 81,
+          "m05": 171,
+          "m06": 20,
+          "m07": 44,
+          "m08": 296,
+          "m09": 254,
+          "m11": 264,
+          "z01": 117,
+          "z02": 178,
+          "z03": 96,
+          "z04": 353,
+          "z05": 239,
+          "z07": 94,
+          "z09": 243,
+          "z10": 172,
+          "z11": 135,
+          "z13": 25
+        },
+        "total_hours": 4.722465,
+        "total_seconds": 17000.874112,
+        "utterances": 3057
+      },
+      "utterance_id_sha256": "54c39fd2f6b78966d84935b3172961560c408357d074ce87a88d3590ce39c134"
+    },
+    "train_unseen_speakers": {
+      "manifest": "train_unseen_speakers.jsonl",
+      "summary": {
+        "corpora": {},
+        "genders": {},
+        "speaker_count": 0,
+        "speakers": {},
+        "total_hours": 0.0,
+        "total_seconds": 0,
+        "utterances": 0
+      },
+      "utterance_id_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "val": {
+      "manifest": "val.jsonl",
+      "summary": {
+        "corpora": {
+          "mz": 1205
+        },
+        "genders": {
+          "female": 806,
+          "male": 399
+        },
+        "speaker_count": 22,
+        "speakers": {
+          "m01": 31,
+          "m02": 1,
+          "m03": 10,
+          "m05": 19,
+          "m06": 3,
+          "m07": 5,
+          "m08": 33,
+          "m09": 29,
+          "m10": 238,
+          "m11": 30,
+          "z01": 13,
+          "z02": 20,
+          "z03": 11,
+          "z04": 40,
+          "z05": 27,
+          "z07": 11,
+          "z08": 569,
+          "z09": 27,
+          "z10": 20,
+          "z11": 16,
+          "z12": 49,
+          "z13": 3
+        },
+        "total_hours": 1.806637,
+        "total_seconds": 6503.892318,
+        "utterances": 1205
+      },
+      "utterance_id_sha256": "c761185ff506b5bdd4ef142905b66e5dcde4f00e086d94952ad20d61db2e3bf7"
+    },
+    "val_seen_speakers": {
+      "manifest": "val_seen_speakers.jsonl",
+      "summary": {
+        "corpora": {
+          "mz": 349
+        },
+        "genders": {
+          "female": 188,
+          "male": 161
+        },
+        "speaker_count": 19,
+        "speakers": {
+          "m01": 31,
+          "m02": 1,
+          "m03": 10,
+          "m05": 19,
+          "m06": 3,
+          "m07": 5,
+          "m08": 33,
+          "m09": 29,
+          "m11": 30,
+          "z01": 13,
+          "z02": 20,
+          "z03": 11,
+          "z04": 40,
+          "z05": 27,
+          "z07": 11,
+          "z09": 27,
+          "z10": 20,
+          "z11": 16,
+          "z13": 3
+        },
+        "total_hours": 0.544708,
+        "total_seconds": 1960.950007,
+        "utterances": 349
+      },
+      "utterance_id_sha256": "c99339370460cf065e1be617e4abfb73733a9c566503144ba5852896daef1daf"
+    },
+    "val_unseen_speakers": {
+      "manifest": "val_unseen_speakers.jsonl",
+      "summary": {
+        "corpora": {
+          "mz": 856
+        },
+        "genders": {
+          "female": 618,
+          "male": 238
+        },
+        "speaker_count": 3,
+        "speakers": {
+          "m10": 238,
+          "z08": 569,
+          "z12": 49
+        },
+        "total_hours": 1.261928,
+        "total_seconds": 4542.942311,
+        "utterances": 856
+      },
+      "utterance_id_sha256": "4bb66b0507fd028d1f28958b91f1fd0901a04040840767fe542bf62c24738c16"
+    }
+  },
+  "created_at_utc": "2026-06-13T16:15:07.734655+00:00",
+  "dataset": "veprad",
+  "selection": {
+    "random_seed": null,
+    "random_source": "system_random",
+    "same_speaker_validation_counts": {
+      "m01": 31,
+      "m02": 1,
+      "m03": 10,
+      "m05": 19,
+      "m06": 3,
+      "m07": 5,
+      "m08": 33,
+      "m09": 29,
+      "m10": 238,
+      "m11": 30,
+      "z01": 13,
+      "z02": 20,
+      "z03": 11,
+      "z04": 40,
+      "z05": 27,
+      "z07": 11,
+      "z08": 569,
+      "z09": 27,
+      "z10": 20,
+      "z11": 16,
+      "z12": 49,
+      "z13": 3
+    },
+    "same_speaker_validation_ratio": 0.1,
+    "validation_unseen_speakers": [
+      "m10",
+      "z08",
+      "z12"
+    ]
+  },
+  "selection_policy": {
+    "description": "Cross-validation split: all utterances from randomly selected validation speakers plus ceil(ratio * utterances) from every remaining speaker.",
+    "rounding": "ceil_per_speaker",
+    "same_speaker_validation_ratio": 0.1,
+    "validation_unseen_speaker_count": 3
+  },
+  "source_manifest": "data/cross_validation_splits/raw_train_val/source.jsonl",
+  "source_manifest_sha256": "0cc1505d03e03ea1e19893efafb390a738f17dcddcc80bda2ea9f2ac3d929fa7",
+  "source_summary": {
+    "corpora": {
+      "mz": 4262
+    },
+    "genders": {
+      "female": 2458,
+      "male": 1804
+    },
+    "speaker_count": 22,
+    "speakers": {
+      "m01": 301,
+      "m02": 6,
+      "m03": 91,
+      "m05": 190,
+      "m06": 23,
+      "m07": 49,
+      "m08": 329,
+      "m09": 283,
+      "m10": 238,
+      "m11": 294,
+      "z01": 130,
+      "z02": 198,
+      "z03": 107,
+      "z04": 393,
+      "z05": 266,
+      "z07": 105,
+      "z08": 569,
+      "z09": 270,
+      "z10": 192,
+      "z11": 151,
+      "z12": 49,
+      "z13": 28
+    },
+    "total_hours": 6.529102,
+    "total_seconds": 23504.76643,
+    "utterances": 4262
+  },
+  "source_utterance_id_sha256": "1e216bc700e6e5cffd3bf972cea6a3b98f8827fe64268d8630549fb3bc879d20",
+  "split_id": "cv_paper_small_001"
+}

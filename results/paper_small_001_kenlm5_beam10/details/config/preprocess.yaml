@@ -1,0 +1,9 @@
+process:
+  - type: fbank_kaldi
+    fs: 16000
+    n_mels: 161
+    n_shift: 160
+    win_length: 400
+    dither: 0.1
+  - type: cmvn_json
+    cmvn_path: data/mean_std.json

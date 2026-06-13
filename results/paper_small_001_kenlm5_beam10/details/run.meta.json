@@ -1,0 +1,243 @@
+{
+  "avg_num": 1,
+  "cmvn_path": "results/paper_small_001_kenlm5_beam10/details/generated/paddlespeech_data/mean_std.json",
+  "components": {
+    "test": {
+      "raw_manifest": "results/paper_small_001_kenlm5_beam10/details/generated/paddlespeech_data/raw_manifests/test.raw.jsonl",
+      "source_manifest": "data/test/test.jsonl",
+      "summary": {
+        "speaker_count": 25,
+        "speakers": {
+          "m01": 34,
+          "m02": 1,
+          "m03": 11,
+          "m04": 383,
+          "m05": 22,
+          "m06": 3,
+          "m07": 6,
+          "m08": 37,
+          "m09": 32,
+          "m10": 27,
+          "m11": 33,
+          "z01": 15,
+          "z02": 23,
+          "z03": 12,
+          "z04": 44,
+          "z05": 30,
+          "z06": 91,
+          "z07": 12,
+          "z08": 64,
+          "z09": 31,
+          "z10": 22,
+          "z11": 17,
+          "z12": 6,
+          "z13": 4,
+          "z14": 33
+        },
+        "total_hours": 1.50394,
+        "total_seconds": 5414.185183,
+        "utterances": 993
+      }
+    },
+    "test_seen_speakers": {
+      "raw_manifest": "results/paper_small_001_kenlm5_beam10/details/generated/paddlespeech_data/raw_manifests/test_seen_speakers.raw.jsonl",
+      "source_manifest": "data/test/test_seen_speakers.jsonl",
+      "summary": {
+        "speaker_count": 22,
+        "speakers": {
+          "m01": 34,
+          "m02": 1,
+          "m03": 11,
+          "m05": 22,
+          "m06": 3,
+          "m07": 6,
+          "m08": 37,
+          "m09": 32,
+          "m10": 27,
+          "m11": 33,
+          "z01": 15,
+          "z02": 23,
+          "z03": 12,
+          "z04": 44,
+          "z05": 30,
+          "z07": 12,
+          "z08": 64,
+          "z09": 31,
+          "z10": 22,
+          "z11": 17,
+          "z12": 6,
+          "z13": 4
+        },
+        "total_hours": 0.741424,
+        "total_seconds": 2669.124627,
+        "utterances": 486
+      }
+    },
+    "test_unseen_speakers": {
+      "raw_manifest": "results/paper_small_001_kenlm5_beam10/details/generated/paddlespeech_data/raw_manifests/test_unseen_speakers.raw.jsonl",
+      "source_manifest": "data/test/test_unseen_speakers.jsonl",
+      "summary": {
+        "speaker_count": 3,
+        "speakers": {
+          "m04": 383,
+          "z06": 91,
+          "z14": 33
+        },
+        "total_hours": 0.762517,
+        "total_seconds": 2745.060556,
+        "utterances": 507
+      }
+    },
+    "train": {
+      "raw_manifest": "results/paper_small_001_kenlm5_beam10/details/generated/paddlespeech_data/raw_manifests/train.raw.jsonl",
+      "source_manifest": "data/cross_validation_splits/cv_paper_small_001/train.jsonl",
+      "summary": {
+        "speaker_count": 19,
+        "speakers": {
+          "m01": 270,
+          "m02": 5,
+          "m03": 81,
+          "m05": 171,
+          "m06": 20,
+          "m07": 44,
+          "m08": 296,
+          "m09": 254,
+          "m11": 264,
+          "z01": 117,
+          "z02": 178,
+          "z03": 96,
+          "z04": 353,
+          "z05": 239,
+          "z07": 94,
+          "z09": 243,
+          "z10": 172,
+          "z11": 135,
+          "z13": 25
+        },
+        "total_hours": 4.722465,
+        "total_seconds": 17000.874112,
+        "utterances": 3057
+      }
+    },
+    "val": {
+      "raw_manifest": "results/paper_small_001_kenlm5_beam10/details/generated/paddlespeech_data/raw_manifests/val.raw.jsonl",
+      "source_manifest": "data/cross_validation_splits/cv_paper_small_001/val.jsonl",
+      "summary": {
+        "speaker_count": 22,
+        "speakers": {
+          "m01": 31,
+          "m02": 1,
+          "m03": 10,
+          "m05": 19,
+          "m06": 3,
+          "m07": 5,
+          "m08": 33,
+          "m09": 29,
+          "m10": 238,
+          "m11": 30,
+          "z01": 13,
+          "z02": 20,
+          "z03": 11,
+          "z04": 40,
+          "z05": 27,
+          "z07": 11,
+          "z08": 569,
+          "z09": 27,
+          "z10": 20,
+          "z11": 16,
+          "z12": 49,
+          "z13": 3
+        },
+        "total_hours": 1.806637,
+        "total_seconds": 6503.892318,
+        "utterances": 1205
+      }
+    },
+    "val_seen_speakers": {
+      "raw_manifest": "results/paper_small_001_kenlm5_beam10/details/generated/paddlespeech_data/raw_manifests/val_seen_speakers.raw.jsonl",
+      "source_manifest": "data/cross_validation_splits/cv_paper_small_001/val_seen_speakers.jsonl",
+      "summary": {
+        "speaker_count": 19,
+        "speakers": {
+          "m01": 31,
+          "m02": 1,
+          "m03": 10,
+          "m05": 19,
+          "m06": 3,
+          "m07": 5,
+          "m08": 33,
+          "m09": 29,
+          "m11": 30,
+          "z01": 13,
+          "z02": 20,
+          "z03": 11,
+          "z04": 40,
+          "z05": 27,
+          "z07": 11,
+          "z09": 27,
+          "z10": 20,
+          "z11": 16,
+          "z13": 3
+        },
+        "total_hours": 0.544708,
+        "total_seconds": 1960.950007,
+        "utterances": 349
+      }
+    },
+    "val_unseen_speakers": {
+      "raw_manifest": "results/paper_small_001_kenlm5_beam10/details/generated/paddlespeech_data/raw_manifests/val_unseen_speakers.raw.jsonl",
+      "source_manifest": "data/cross_validation_splits/cv_paper_small_001/val_unseen_speakers.jsonl",
+      "summary": {
+        "speaker_count": 3,
+        "speakers": {
+          "m10": 238,
+          "z08": 569,
+          "z12": 49
+        },
+        "total_hours": 1.261928,
+        "total_seconds": 4542.942311,
+        "utterances": 856
+      }
+    }
+  },
+  "config": "conf/deepspeech2_paper_small.yaml",
+  "created_at_utc": "2026-06-13T16:34:42.597695+00:00",
+  "decode_config": "results/paper_small_001_kenlm5_beam10/details/lm/decode_kenlm5_beam10.yaml",
+  "device": "gpu:0",
+  "ngpu": 1,
+  "preprocess_config": "results/paper_small_001_kenlm5_beam10/details/generated/paddlespeech_data/preprocess.yaml",
+  "run_name": "paper_small_001_kenlm5_beam10",
+  "split_dir": "data/cross_validation_splits/cv_paper_small_001",
+  "split_id": "cv_paper_small_001",
+  "vocab_coverage": {
+    "test": {
+      "unknown_character_total": 0,
+      "unknown_characters": {}
+    },
+    "test_seen_speakers": {
+      "unknown_character_total": 0,
+      "unknown_characters": {}
+    },
+    "test_unseen_speakers": {
+      "unknown_character_total": 0,
+      "unknown_characters": {}
+    },
+    "train": {
+      "unknown_character_total": 0,
+      "unknown_characters": {}
+    },
+    "val": {
+      "unknown_character_total": 0,
+      "unknown_characters": {}
+    },
+    "val_seen_speakers": {
+      "unknown_character_total": 0,
+      "unknown_characters": {}
+    },
+    "val_unseen_speakers": {
+      "unknown_character_total": 0,
+      "unknown_characters": {}
+    }
+  },
+  "vocab_path": "results/paper_small_001_kenlm5_beam10/details/generated/paddlespeech_data/lang_char/vocab.txt"
+}
