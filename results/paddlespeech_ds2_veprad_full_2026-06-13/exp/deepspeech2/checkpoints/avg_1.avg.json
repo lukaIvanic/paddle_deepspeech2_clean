@@ -1,0 +1,1 @@
+{"mode": "val_best", "avg_ckpt": "exp/deepspeech2/checkpoints/avg_1.pdparams", "val_loss_mean": 21.20010570716858, "ckpts": ["exp/deepspeech2/checkpoints/10.pdparams"], "epochs": [10], "val_losses": [21.20010570716858]}

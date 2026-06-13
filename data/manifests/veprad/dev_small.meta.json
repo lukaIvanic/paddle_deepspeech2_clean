@@ -1,0 +1,14 @@
+{
+  "dataset": "veprad",
+  "logical_split": "dev_small",
+  "max_duration": 9.407375,
+  "min_duration": 1.603125,
+  "seed": 13,
+  "source_manifest": "/Users/lukaivanic/projects/faks/Računalna obrada govora i jezika/Projekt - DeepSpeech2/data/manifests/veprad/dev.jsonl",
+  "subset_max_hours": 0.08333333333333333,
+  "total_hours": 0.083331,
+  "total_seconds": 299.992502,
+  "unique_chapters": 0,
+  "unique_speakers": 3,
+  "utterances": 58
+}

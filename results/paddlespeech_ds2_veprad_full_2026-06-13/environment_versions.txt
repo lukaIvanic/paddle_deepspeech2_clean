@@ -1,0 +1,5 @@
+PaddleSpeech_commit=6b25a40
+python=3.10.14
+paddle=2.6.2
+paddlespeech=1.5.0
+numpy=1.26.4

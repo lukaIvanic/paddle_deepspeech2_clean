@@ -1,0 +1,25 @@
+{
+  "corpus": "sm04",
+  "dataset": "veprad",
+  "diagnostics": {
+    "audio_files": 2329,
+    "corpus": "sm04",
+    "empty_after_normalization": [],
+    "missing_transcripts": [
+      "data/raw/veprad/audio_sm04/sm04070105231.wav"
+    ],
+    "text_without_audio": [
+      "data/raw/veprad/text_sm04/sm04010103101.txt",
+      "data/raw/veprad/text_sm04/sm04010103102.txt"
+    ],
+    "transcript_files": 2330,
+    "usable_records": 2328
+  },
+  "max_duration": 16.3485,
+  "min_duration": 0.273687,
+  "total_hours": 2.42588,
+  "total_seconds": 8733.16782,
+  "unique_chapters": 0,
+  "unique_speakers": 1,
+  "utterances": 2328
+}

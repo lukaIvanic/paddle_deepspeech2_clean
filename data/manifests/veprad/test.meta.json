@@ -1,0 +1,18 @@
+{
+  "dataset": "veprad",
+  "logical_split": "test",
+  "max_duration": 9.932,
+  "min_duration": 0.699688,
+  "ratios": {
+    "dev": 0.1,
+    "test": 0.1,
+    "train": 0.8
+  },
+  "seed": 13,
+  "split_strategy": "speaker_split_on_mz_plus_sm04_train",
+  "total_hours": 0.891648,
+  "total_seconds": 3209.931379,
+  "unique_chapters": 0,
+  "unique_speakers": 2,
+  "utterances": 580
+}

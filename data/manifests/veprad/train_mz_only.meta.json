@@ -1,0 +1,14 @@
+{
+  "excluded_corpus": "sm04",
+  "excluded_utterances": 2328,
+  "filter": "corpus == 'mz'",
+  "max_duration": 10.479563,
+  "min_duration": 0.480063,
+  "purpose": "SM04 robustness ablation: train without the single-speaker SM04 corpus",
+  "source_manifest": "/Users/lukaivanic/projects/faks/Računalna obrada govora i jezika/Projekt - DeepSpeech2/data/manifests/veprad/train.jsonl",
+  "total_hours": 6.749881,
+  "total_seconds": 24299.571052,
+  "unique_chapters": 0,
+  "unique_speakers": 20,
+  "utterances": 4426
+}

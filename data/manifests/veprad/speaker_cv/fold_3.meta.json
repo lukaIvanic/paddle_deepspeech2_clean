@@ -1,0 +1,108 @@
+{
+  "fold": 3,
+  "train_speakers": [
+    "m02",
+    "m03",
+    "m06",
+    "m07",
+    "m08",
+    "m10",
+    "sm04",
+    "z01",
+    "z04",
+    "z05",
+    "z06",
+    "z08",
+    "z09",
+    "z10",
+    "z11",
+    "z13"
+  ],
+  "dev_speakers": [
+    "m01",
+    "m05",
+    "m11",
+    "z07",
+    "z12"
+  ],
+  "test_speakers": [
+    "m04",
+    "m09",
+    "z02",
+    "z03",
+    "z14"
+  ],
+  "train": {
+    "utterances": 5466,
+    "total_seconds": 26020.131035,
+    "total_hours": 7.227814,
+    "speaker_count": 16,
+    "speakers": {
+      "m02": 7,
+      "m03": 102,
+      "m06": 26,
+      "m07": 55,
+      "m08": 366,
+      "m10": 265,
+      "sm04": 2328,
+      "z01": 145,
+      "z04": 437,
+      "z05": 296,
+      "z06": 91,
+      "z08": 633,
+      "z09": 301,
+      "z10": 214,
+      "z11": 168,
+      "z13": 32
+    },
+    "corpora": {
+      "mz": 3138,
+      "sm04": 2328
+    },
+    "genders": {
+      "female": 2317,
+      "male": 821,
+      "unknown": 2328
+    }
+  },
+  "dev": {
+    "utterances": 1046,
+    "total_seconds": 5881.432076,
+    "total_hours": 1.633731,
+    "speaker_count": 5,
+    "speakers": {
+      "m01": 335,
+      "m05": 212,
+      "m11": 327,
+      "z07": 117,
+      "z12": 55
+    },
+    "corpora": {
+      "mz": 1046
+    },
+    "genders": {
+      "female": 172,
+      "male": 874
+    }
+  },
+  "test": {
+    "utterances": 1071,
+    "total_seconds": 5750.556322,
+    "total_hours": 1.597377,
+    "speaker_count": 5,
+    "speakers": {
+      "m04": 383,
+      "m09": 315,
+      "z02": 221,
+      "z03": 119,
+      "z14": 33
+    },
+    "corpora": {
+      "mz": 1071
+    },
+    "genders": {
+      "female": 373,
+      "male": 698
+    }
+  }
+}

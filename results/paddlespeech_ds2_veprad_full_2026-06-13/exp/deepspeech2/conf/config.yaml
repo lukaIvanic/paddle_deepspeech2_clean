@@ -1,0 +1,59 @@
+accum_grad: 1
+batch_bins: 0
+batch_count: auto
+batch_frames_in: 0
+batch_frames_inout: 0
+batch_frames_out: 0
+batch_size: 32
+blank_id: 0
+checkpoint:
+  kbest_n: 10
+  latest_n: 5
+decode:
+  alpha: 2.5
+  beam_size: 1
+  beta: 0.3
+  cutoff_prob: 1.0
+  cutoff_top_n: 40
+  decode_batch_size: 128
+  decoding_method: ctc_beam_search
+  error_rate_type: wer
+  lang_model_path: 
+  num_proc_bsearch: 1
+dev_manifest: data/manifest.dev
+dist_sampler: False
+fc_layers_size_list: (-1,)
+feat_dim: 161
+global_grad_clip: 5.0
+log_interval: 20
+lr: 0.0005
+lr_decay: 0.93
+max_input_len: 30.0
+max_output_input_ratio: 10.0
+max_output_len: 400.0
+maxlen_in: 512
+maxlen_out: 150
+min_input_len: 0.0
+min_output_input_ratio: 0.05
+min_output_len: 0.0
+minibatches: 0
+n_epoch: 15
+num_conv_layers: 2
+num_encs: 1
+num_fc_layers: 0
+num_rnn_layers: 5
+num_workers: 8
+preprocess_config: conf/preprocess.yaml
+rnn_direction: bidirect
+rnn_layer_size: 1024
+sortagrad: 0
+spm_model_prefix: 
+stride_ms: 10.0
+subsampling_factor: 1
+test_manifest: data/manifest.test
+train_manifest: data/manifest.train
+unit_type: char
+use_gru: False
+vocab_filepath: data/lang_char/vocab.txt
+weight_decay: 1e-06
+window_ms: 25.0

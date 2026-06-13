@@ -1,0 +1,44 @@
+# Local environment and editor files
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+.idea/
+.vscode/
+
+# Official PaddleSpeech checkout is kept local, not vendored into this repo.
+PaddleSpeech/
+results/**/code_snapshot/paddlespeech/
+
+# Local run outputs
+/exp/
+/log/
+
+# VEPRAD corpus data and generated PaddleSpeech data are kept out of Git.
+data/*
+!data/manifests/
+data/manifests/veprad/*
+!data/manifests/veprad/*.meta.json
+!data/manifests/veprad/speaker_cv/
+data/manifests/veprad/speaker_cv/*
+!data/manifests/veprad/speaker_cv/*.meta.json
+
+# Portable-bundle checksum inventory includes local data artifacts.
+SHA256SUMS.txt
+
+# Model and checkpoint artifacts
+*.pdparams
+*.pdopt
+*.pdmodel
+*.ckpt
+*.onnx
+*.pt
+*.pth
+*.safetensors
+
+# Decoded per-utterance outputs include transcript text.
+results/**/exp/**/checkpoints/*.rsl
+results/**/utterance_metrics.tsv
+results/**/top_30_errors.md
+results/**/data/

@@ -1,0 +1,12 @@
+2026-06-13 09:42:40.934 | DEBUG    | paddlespeech.s2t:<module>:41 - register user sigmoid to paddle, remove this when fixed!
+2026-06-13 09:42:40.935 | DEBUG    | paddlespeech.s2t:<module>:45 - register user log_sigmoid to paddle, remove this when fixed!
+2026-06-13 09:42:40.935 | DEBUG    | paddlespeech.s2t:<module>:49 - register user relu to paddle, remove this when fixed!
+2026-06-13 09:42:40.935 | DEBUG    | paddlespeech.s2t:<module>:58 - override cat of paddle if exists or register, remove this when fixed!
+2026-06-13 09:42:40.935 | DEBUG    | paddlespeech.s2t:<module>:80 - override long of paddle.Tensor if exists or register, remove this when fixed!
+2026-06-13 09:42:40.935 | DEBUG    | paddlespeech.s2t:<module>:102 - override new_full of paddle.Tensor if exists or register, remove this when fixed!
+2026-06-13 09:42:40.935 | DEBUG    | paddlespeech.s2t:<module>:220 - register user repeat to paddle.Tensor, remove this when fixed!
+2026-06-13 09:42:40.936 | DEBUG    | paddlespeech.s2t:<module>:226 - register user softmax to paddle.Tensor, remove this when fixed!
+2026-06-13 09:42:40.936 | DEBUG    | paddlespeech.s2t:<module>:236 - register user relu to paddle.Tensor, remove this when fixed!
+2026-06-13 09:42:40.936 | DEBUG    | paddlespeech.s2t:<module>:245 - register user type_as to paddle.Tensor, remove this when fixed!
+2026-06-13 09:42:40.936 | DEBUG    | paddlespeech.s2t:<module>:272 - register user float to paddle.Tensor, remove this when fixed!
+2026-06-13 09:42:40.936 | DEBUG    | paddlespeech.s2t:<module>:283 - register user int to paddle.Tensor, remove this when fixed!
