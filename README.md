@@ -3,7 +3,7 @@
 Self-contained folder for the official PaddleSpeech DeepSpeech2 VEPRAD run.
 
 This folder replaces the old toy/local DeepSpeech2 experiments. It contains the
-VEPRAD audio, manifests, PaddleSpeech source checkout, recipe files, helper
+VEPRAD split metadata, PaddleSpeech source checkout, recipe files, helper
 scripts, and archived completed-run outputs needed to reproduce or audit the
 from-scratch PaddleSpeech DeepSpeech2 baseline.
 
@@ -17,14 +17,20 @@ end to end.
 
 - `PaddleSpeech/`: pinned PaddleSpeech repository checkout at commit
   `6b25a400008d393f9c3af837b3c692b17f29ee1a`.
-- `data/raw/veprad/`: VEPRAD audio/text corpus.
-- `data/manifests/veprad/`: canonical VEPRAD manifests and speaker-CV manifests.
+- `data/test/`: frozen held-out test split metadata. The local JSONL manifest
+  and raw audio/text files are ignored by Git.
+- `data/cross_validation_splits/raw_train_val/`: non-test source pool for
+  future train/validation splits. The local JSONL manifest and raw audio/text
+  files are ignored by Git.
+- `data/cross_validation_splits/`: parent folder for future CV split folders.
 - `data/paddlespeech/`: generated PaddleSpeech raw manifests. This directory is
   created by `scripts/data.sh` during stage `-1` and is not required before the
   first run.
 - `conf/`: training, preprocessing, and decode configs.
 - `scripts/`: adapted PaddleSpeech recipe scripts for VEPRAD plus helper
   utilities. `scripts/run.sh` is the main recipe entrypoint.
+- `scripts/create_frozen_test_split.py`: one-time script that physically
+  separated the frozen test split from the train/validation source pool.
 - `scripts/convert_project_manifests_to_paddlespeech.py`: converts bundled
   VEPRAD manifests into PaddleSpeech raw JSONL.
 - `scripts/recompute_asr_metrics.py`: independently recomputes WER/CER from a
@@ -68,7 +74,8 @@ Expected commit:
 6b25a400008d393f9c3af837b3c692b17f29ee1a
 ```
 
-Then run the recipe:
+After a train/validation split has been generated and converted to the
+PaddleSpeech `data/manifest.*` files, run the recipe:
 
 ```bash
 bash scripts/run.sh --stage 0 --stop_stage 0 --gpus 0
@@ -76,32 +83,38 @@ bash scripts/run.sh --stage 1 --stop_stage 1 --gpus 0
 bash scripts/run.sh --stage 2 --stop_stage 3 --gpus 0 --avg_num 1
 ```
 
-## Planned Dataset Split Pipeline
+## Dataset Split Pipeline
 
 The archived baseline below used the existing VEPRAD manifests copied from the
-earlier project. For the next reproducible experiment series, use a stricter
-two-dimensional split protocol that separates both speakers and utterances.
+earlier project. Future experiment runs use a stricter two-dimensional split
+protocol that separates both speakers and utterances.
 
-First, create one frozen test split and do not regenerate it during model
-selection. The test split should contain all utterances from 3 randomly selected
-speakers. From all remaining speakers, also add 10% of each speaker's utterances,
-rounded up, so speakers with very few utterances still contribute at least one
-test example. After this step, the test manifest is fixed and should not be
-changed unless the whole experiment protocol is explicitly restarted.
+The ambiguous `sm04` subset was excluded before creating new splits. It appears
+to be a segmented speech-synthesis subset from a male VEPRAD speaker and can
+overlap with regular `m04` material, so keeping it in the ASR pool would risk
+speaker/content leakage.
 
-Cross-validation runs are then sampled only from the remaining non-test data.
-For each validation run, randomly select 3 validation speakers and use all of
-their remaining utterances for validation. From all other available speakers,
-also add 10% of each speaker's remaining utterances, rounded up, to validation.
-All remaining utterances form the training split for that run. These validation
-folds are intentionally random per run; the frozen manifests written for a run
-are the reproducibility record rather than a hard-coded seed.
+The frozen test split has been created once and should not be regenerated during
+model selection. It contains all utterances from 3 randomly selected speakers
+and 10% of each remaining speaker's utterances, rounded up so speakers with very
+few utterances still contribute at least one test example. The selected fully
+held-out speakers are `m04`, `z06`, and `z14`.
+
+The test data lives under `data/test/`. The remaining non-test pool lives under
+`data/cross_validation_splits/raw_train_val/`. Cross-validation runs should be
+sampled only from that non-test pool. For each validation run, randomly select 3
+validation speakers and use all of their remaining utterances for validation.
+From all other available speakers, also add 10% of each speaker's remaining
+utterances, rounded up, to validation. All remaining utterances form the
+training split for that run. These validation folds are intentionally random per
+run; the frozen manifests written for a run are the reproducibility record
+rather than a hard-coded seed.
 
 | Stage | Pool | Speaker-held-out component | Same-speaker utterance component | Output |
 | --- | --- | --- | --- | --- |
-| Source corpus | All normalized VEPRAD utterances | None | None | Full manifest |
-| Frozen test split | Full manifest | All utterances from 3 random speakers | 10% of utterances from all remaining speakers, rounded up per speaker | Fixed test manifest |
-| CV input pool | Full manifest minus frozen test | Test speakers and test utterances removed | Test utterances removed from remaining speakers | Remaining pool |
+| Source corpus | Regular VEPRAD `mXX/zXX` utterances, excluding `sm04` | None | None | One-time pre-split source manifest |
+| Frozen test split | Full regular-speaker source manifest | All utterances from `m04`, `z06`, and `z14` | 10% of utterances from all remaining speakers, rounded up per speaker | `data/test/` |
+| CV input pool | Full source minus frozen test | Test speakers and test utterances removed | Test utterances removed from remaining speakers | `data/cross_validation_splits/raw_train_val/` |
 | One CV validation split | CV input pool | All remaining utterances from 3 random validation speakers | 10% of remaining utterances from all other available speakers, rounded up per speaker | Validation manifest for this run |
 | One CV training split | CV input pool minus validation split | Validation speakers removed for that run | Validation utterances removed from remaining speakers | Training manifest for this run |
 
@@ -133,6 +146,9 @@ from speakers that are still represented in training.
 
 - `REMOTE_SERVER.md`: current remote GPU access and Python environment notes.
 - `conf/deepspeech2.yaml`: model/training config.
+- `data/test/test.meta.json`: frozen test split audit metadata.
+- `data/cross_validation_splits/raw_train_val/source.meta.json`: non-test
+  train/validation source pool audit metadata.
 - `scripts/data.sh`: VEPRAD data preparation stages.
 - `scripts/run.sh`: recipe driver for data preparation, training, averaging, and
   testing.

@@ -17,12 +17,21 @@ results/**/code_snapshot/paddlespeech/
 
 # VEPRAD corpus data and generated PaddleSpeech data are kept out of Git.
 data/*
-!data/manifests/
-data/manifests/veprad/*
-!data/manifests/veprad/*.meta.json
-!data/manifests/veprad/speaker_cv/
-data/manifests/veprad/speaker_cv/*
-!data/manifests/veprad/speaker_cv/*.meta.json
+
+# Public split documentation/metadata is safe to track. JSONL manifests and raw
+# audio/text stay ignored because they contain transcript data.
+!data/test/
+data/test/*
+!data/test/README.md
+!data/test/*.meta.json
+
+!data/cross_validation_splits/
+data/cross_validation_splits/*
+!data/cross_validation_splits/README.md
+!data/cross_validation_splits/*/
+data/cross_validation_splits/*/*
+!data/cross_validation_splits/*/README.md
+!data/cross_validation_splits/*/*.meta.json
 
 # Model and checkpoint artifacts
 *.pdparams
