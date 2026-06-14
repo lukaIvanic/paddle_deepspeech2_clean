@@ -1,0 +1,13 @@
+{
+  "epochs": 8.0,
+  "freeze_feature_encoder": true,
+  "global_step": 408,
+  "gradient_accumulation_steps": 4,
+  "gradient_checkpointing": true,
+  "learning_rate": 0.0003,
+  "model_name": "/workspace/hf_models/classla_wav2vec2_large_slavic_parlaspeech_hr_lm_local_tokenizer_fix",
+  "per_device_train_batch_size": 16,
+  "train_utterances": 3298,
+  "warmup_ratio": null,
+  "warmup_steps": 500
+}

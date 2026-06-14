@@ -1,0 +1,19 @@
+{
+  "cer_including_spaces": 0.010146916552298242,
+  "cer_no_spaces": 0.009566685424873381,
+  "char_edits_including_spaces": 902,
+  "char_edits_no_spaces": 731,
+  "decoder": "finetuned_bundled_lm",
+  "exact_match_rate": 0.6431535269709544,
+  "exact_match_utterances": 620,
+  "macro_cer_including_spaces": 0.012363151185400444,
+  "macro_cer_no_spaces": 0.011989355073779247,
+  "macro_wer": 0.039200241741349715,
+  "num_utterances": 964,
+  "reference_chars_including_spaces": 88894,
+  "reference_chars_no_spaces": 76411,
+  "reference_words": 13447,
+  "subset": "val",
+  "wer": 0.03718301479883989,
+  "word_edits": 500
+}

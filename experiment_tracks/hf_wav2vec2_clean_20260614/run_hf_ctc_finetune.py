@@ -624,6 +624,10 @@ def fine_tune(args: argparse.Namespace, model, processor, rows_by_name: dict[str
 
 
 def write_summary_markdown(path: Path, report: dict) -> None:
+    split_summaries = report.get("split_validation", {}).get("summaries", {})
+    speaker_policy = report.get("split_validation", {}).get("speaker_policy", {})
+    hyper = report.get("hyperparameters", {})
+    training = report.get("training", {})
     lines = [
         f"# {report['track_id']}",
         "",
@@ -633,11 +637,84 @@ def write_summary_markdown(path: Path, report: dict) -> None:
         f"- Epochs: `{report['training']['epochs']}`",
         f"- Bundled LM: `{report['external_lm']['has_bundled_lm']}`",
         "",
-        "## Metrics",
-        "",
-        "| Decoder | Subset | WER | CER spaces | CER no spaces |",
-        "|---|---:|---:|---:|---:|",
     ]
+    if split_summaries:
+        lines.extend(
+            [
+                "## Split",
+                "",
+                "| Subset | Utterances | Hours | Speakers |",
+                "|---|---:|---:|---:|",
+            ]
+        )
+        for subset in (
+            "train",
+            "val",
+            "val_seen_speakers",
+            "val_unseen_speakers",
+            "test",
+            "test_seen_speakers",
+            "test_unseen_speakers",
+        ):
+            item = split_summaries.get(subset)
+            if not item:
+                continue
+            lines.append(
+                f"| {subset} | {item['utterances']} | {item['total_hours']:.6f} | "
+                f"{item['speaker_count']} |"
+            )
+        val_unseen = speaker_policy.get("val_unseen_speakers")
+        test_unseen = speaker_policy.get("test_unseen_speakers")
+        if val_unseen:
+            lines.append("")
+            lines.append(f"Validation unseen speakers: `{', '.join(val_unseen)}`.")
+        if test_unseen:
+            lines.append(f"Test unseen speakers: `{', '.join(test_unseen)}`.")
+        lines.append("")
+
+    lines.extend(
+        [
+            "## Training",
+            "",
+            "| Setting | Value |",
+            "|---|---:|",
+            f"| epochs | {training.get('epochs')} |",
+            f"| train batch size | {hyper.get('train_batch_size')} |",
+            f"| gradient accumulation | {hyper.get('gradient_accumulation_steps')} |",
+            f"| effective batch size | {hyper.get('effective_train_batch_size')} |",
+            f"| optimizer updates | {training.get('global_step')} |",
+            f"| learning rate | {hyper.get('learning_rate')} |",
+            f"| warmup steps | {hyper.get('warmup_steps')} |",
+            f"| fp16 | {hyper.get('fp16')} |",
+            f"| freeze feature encoder | {training.get('freeze_feature_encoder')} |",
+            f"| gradient checkpointing | {training.get('gradient_checkpointing')} |",
+            "",
+            "## Notes",
+            "",
+            "- The bundled LM is the checkpoint's fixed external ParlaMint LM; no VEPRAD KenLM was trained for this run.",
+            f"- The split validator passed: `{report.get('split_validation', {}).get('passed')}`.",
+        ]
+    )
+    overlap = report.get("split_validation", {}).get("pre_lm_train_text_overlap_report")
+    if overlap:
+        lines.append(
+            "- The validator reports repeated or near-repeated transcript text across train and held-out sets. "
+            "This matters for any text-only LM trained on VEPRAD, but this run did not train such an LM."
+        )
+    ft_greedy = report.get("metrics", {}).get("finetuned_greedy", {}).get("test")
+    ft_lm = report.get("metrics", {}).get("finetuned_bundled_lm", {}).get("test")
+    if ft_greedy and ft_lm:
+        better = "greedy" if ft_greedy["wer"] <= ft_lm["wer"] else "bundled-LM"
+        lines.append(f"- After fine-tuning, `{better}` decoding had the lower full-test WER.")
+    lines.extend(
+        [
+            "",
+            "## Metrics",
+            "",
+            "| Decoder | Subset | WER | CER spaces | CER no spaces |",
+            "|---|---:|---:|---:|---:|",
+        ]
+    )
     for decoder_name in report["metrics"]:
         for subset in EVAL_COMPONENTS:
             metrics = report["metrics"][decoder_name][subset]
