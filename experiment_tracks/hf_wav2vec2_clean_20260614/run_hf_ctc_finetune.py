@@ -263,7 +263,16 @@ class CTCManifestDataset:
         if audio.ndim > 1:
             audio = audio.mean(axis=1)
         if sample_rate != 16000:
-            raise RuntimeError(f"Expected 16 kHz audio, got {sample_rate}: {audio_path}")
+            import torch
+            import torchaudio.functional as F
+
+            audio_tensor = torch.from_numpy(audio)
+            audio = F.resample(
+                audio_tensor,
+                orig_freq=sample_rate,
+                new_freq=16000,
+            ).numpy()
+            sample_rate = 16000
 
         item = {
             "input_values": self.processor(
@@ -759,6 +768,8 @@ def main() -> int:
             "fp16": args.fp16 and args.device == "cuda",
             "seed": args.seed,
             "bundled_lm_beam": args.bundled_lm_beam,
+            "target_sample_rate": 16000,
+            "resample_audio_to_target": True,
         },
         "split_validation": split_validation,
         "external_lm": {
