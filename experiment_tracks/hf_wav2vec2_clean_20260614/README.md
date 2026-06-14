@@ -22,7 +22,8 @@ Install the non-Paddle dependencies in the remote Python environment:
 
 ```bash
 python -m pip install \
-  transformers accelerate soundfile pyctcdecode kenlm tqdm pyyaml
+  "transformers==4.18.0" "tokenizers==0.12.1" "numpy==1.26.4" \
+  accelerate soundfile pyctcdecode kenlm tqdm pyyaml
 ```
 
 KenLM command-line tools are only needed if `--train-local-veprad-kenlm` is
@@ -36,9 +37,14 @@ export PATH=/workspace/kenlm_tools/build/bin:$PATH
 
 ```bash
 python experiment_tracks/hf_wav2vec2_clean_20260614/run_hf_ctc_finetune.py \
+  --model-name /workspace/hf_models/classla_wav2vec2_large_slavic_parlaspeech_hr_lm_local_tokenizer_fix \
   --device cuda \
   --force-run
 ```
+
+The local model path above is a snapshot of the upstream CLASSLA LM checkpoint
+with tokenizer metadata normalized so the documented `Wav2Vec2ProcessorWithLM`
+path can load it. The acoustic weights and bundled LM files are not changed.
 
 The runner creates a new CV split unless the split folder already exists. It
 then validates split isolation, evaluates the starting checkpoint, fine-tunes

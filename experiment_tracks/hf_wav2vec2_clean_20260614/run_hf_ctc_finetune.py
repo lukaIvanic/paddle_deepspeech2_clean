@@ -71,6 +71,12 @@ def rel_to_project(project_root: Path, path: Path) -> str:
         return resolved.as_posix()
 
 
+def maybe_read_json(path: Path) -> dict | None:
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def normalize_text(text: object) -> str:
     return " ".join(str(text or "").lower().replace("|", " ").split())
 
@@ -511,6 +517,9 @@ def load_model_and_processor(args: argparse.Namespace, rows_by_name: dict[str, l
         "processor_class": processor.__class__.__name__,
         "model_class": model.__class__.__name__,
         "has_bundled_lm": has_bundled_lm,
+        "local_tokenizer_fix": maybe_read_json(Path(args.model_name) / "LOCAL_TOKENIZER_FIX.json")
+        if Path(args.model_name).exists()
+        else None,
     }
 
 
@@ -759,6 +768,7 @@ def main() -> int:
                 "Hugging Face model; this script does not train it on VEPRAD."
             ),
             "has_bundled_lm": load_report["has_bundled_lm"],
+            "local_tokenizer_fix": load_report["local_tokenizer_fix"],
         },
         "local_veprad_kenlm": {
             "enabled": args.train_local_veprad_kenlm,
