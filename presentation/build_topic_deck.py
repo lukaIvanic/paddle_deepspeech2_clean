@@ -20,7 +20,7 @@ SLIDE_W = 12192000
 SLIDE_H = 6858000
 PX_W = 1920
 PX_H = 1080
-SLIDE_COUNT = 7
+SLIDE_COUNT = 8
 
 INK = "15171A"
 INK_2 = "20282C"
@@ -223,63 +223,34 @@ def slide1() -> Slide:
     s = Slide()
     s.rect(0, 0, 505, 1080, INK)
     s.rect(505, 0, 28, 1080, RED)
-    s.text(66, 72, 320, 38, [("ROGJ 2025/26", 22, GOLD, True)])
-    s.text(66, 136, 330, 52, [("Tema 12", 34, CREAM, True)])
-    s.text(
-        66,
-        215,
-        340,
-        150,
-        [
-            ("Učenje akustičkih", 23, SAND, False),
-            ("modela govora", 23, SAND, False),
-            ("za raspoznavanje", 23, SAND, False),
-        ],
-    )
+    s.text(66, 82, 320, 38, [("ROGJ 2025/26", 22, GOLD, True)])
+    s.text(66, 150, 330, 58, [("Tema 12", 38, CREAM, True)])
     s.text(
         610,
-        105,
-        1050,
-        118,
-        [("DeepSpeech2 na VEPRAD-u", 41, INK, True)],
+        150,
+        1080,
+        210,
+        [
+            ("Učenje akustičkih modela govora za raspoznavanje", 37, INK, True),
+            ("pomoću alata DeepSpeech2", 37, INK, True),
+        ],
     )
+    s.line(616, 430, 880, 9, RED)
     s.text(
         616,
-        292,
-        1050,
-        72,
+        500,
+        1080,
+        150,
         [
             (
-                "Zadatak: na temelju baze snimljenog i transkribiranog govora naučiti akustičke modele i testirati rad sustava.",
-                23,
+                "Zadatak: na temelju VEPRAD baze snimljenog i transkribiranog govora naučiti akustičke modele govora i testirati rad sustava.",
+                24,
                 INK_2,
                 False,
             )
         ],
     )
-    s.line(616, 418, 880, 9, RED)
-    s.text(616, 462, 900, 70, [("VEPRAD -> DeepSpeech2 trening -> KenLM -> WER/CER", 21, INK, True)])
-    stats = [
-        ("3", "trenirana modela", TEAL),
-        ("6", "eval subsetova", GOLD),
-        ("0.118", "najbolji test WER", RED),
-    ]
-    x = 616
-    for value, label, color in stats:
-        s.rect(x, 580, 245, 116, color)
-        s.text(x + 22, 596, 180, 44, [(value, 30, CREAM if color != GOLD else INK, True)])
-        s.text(x + 22, 646, 200, 25, [(label, 13, CREAM if color != GOLD else INK, False)])
-        x += 285
-    s.text(
-        616,
-        770,
-        980,
-        130,
-        [
-            ("U prezentaciji: kako smo pripremili VEPRAD, izolirali test skup, definirali CV splitove, trenirali DS2 konfiguracije i izmjerili utjecaj KenLM-a.", 19, MUTED, False)
-        ],
-    )
-    s.text(616, 968, 900, 32, [("Repo: PaddleSpeech DeepSpeech2 pipeline + VEPRAD manifesti + rezultatne metrike", 13, MUTED, False)])
+    s.text(616, 760, 520, 34, [("Luka Ivanić", 18, MUTED, False)])
     return s
 
 
@@ -287,16 +258,16 @@ def slide2() -> Slide:
     s = Slide()
     title(
         s,
-        "02 · VEPRAD PODACI I SPLITOVI",
-        "VEPRAD test skup je odvojen prije cross-validacije.",
-        "Skup koristimo kao uparene audio snimke i transkripte, a govornike držimo kao posebnu os generalizacije.",
+        "02",
+        "VEPRAD dataset",
+        "Korišteni VEPRAD korpus nakon izdvajanja sm04 ima 25 govornika, 5 255 snimljenih iskaza i 8.03 h govora.",
     )
-    s.text(70, 250, 430, 34, [("Permanentni test", 18, INK, True)])
+    s.text(70, 250, 430, 34, [("Test skup", 18, INK, True)])
     s.line(70, 288, 90, 6, RED)
     steps = [
         ("1", "3 govornika se potpuno izdvajaju za test", RED),
         ("2", "iz svih ostalih govornika uzima se oko 10% utterancea za test", TEAL),
-        ("3", "VEPRAD test audio + JSONL žive u data/test i ne ulaze u CV", GOLD),
+        ("3", "test snimke i transkripte izdvojili smo jednom i držimo ih odvojeno od CV skupova", GOLD),
     ]
     y = 320
     for num, text, color in steps:
@@ -335,7 +306,6 @@ def slide2() -> Slide:
     )
     s.rect(70, 880, 1490, 74, SAND, LINE)
     s.text(96, 898, 1438, 38, [("Reproducibilnost: permanentni test skup ne diramo nakon stvaranja; za nove validacijske eksperimente generiramo nove CV splitove iz non-test poola.", 14.5, INK, True)])
-    footer(s, "Izvori u repozitoriju: data/test/*.meta.json, data/cross_validation_splits/cv_paper_small_001, README.")
     return s
 
 
@@ -343,27 +313,28 @@ def slide3() -> Slide:
     s = Slide()
     title(
         s,
-        "03 · PIPELINE",
-        "VEPRAD pipeline je jedan Python tok, ne stari shell recipe.",
-        "Skripta poziva PaddleSpeech Python funkcije direktno: VEPRAD split/manifesti, trening, averaging, eval i metrike.",
+        "03",
+        "VEPRAD + DeepSpeech2 Pipeline",
+        "Od VEPRAD snimki i transkripata gradimo značajke, CTC rječnik, akustički model i WER/CER evaluaciju.",
     )
-    x0, y0 = 92, 292
+    x0, y0 = 70, 292
     stages = [
         ("VEPRAD", "audio + txt", INK),
         ("manifesti", "JSONL rel. paths", TEAL),
-        ("features", "fbank_kaldi + CMVN", GOLD),
+        ("features", "fbank_kaldi\n+ CMVN", GOLD),
         ("vocab", "31 char, train-only", GREEN),
         ("DS2", "CTC trening", RED),
-        ("eval", "WER/CER po subsetu", INK),
+        ("eval", "WER/CER\npo subsetu", INK),
     ]
     x = x0
     for i, (head, sub, color) in enumerate(stages):
-        s.rect(x, y0, 202, 92, color)
-        s.text(x + 18, y0 + 16, 170, 28, [(head, 18, CREAM if color != GOLD else INK, True)])
-        s.text(x + 18, y0 + 53, 168, 20, [(sub, 11.5, CREAM if color != GOLD else INK, False)])
+        s.rect(x, y0, 224, 112, color)
+        s.text(x + 18, y0 + 16, 188, 30, [(head, 18, CREAM if color != GOLD else INK, True)])
+        sub_lines = [(part, 9.8, CREAM if color != GOLD else INK, False) for part in sub.split("\n")]
+        s.text(x + 18, y0 + 54, 188, 48, sub_lines)
         if i < len(stages) - 1:
-            s.text(x + 214, y0 + 26, 36, 32, [("→", 24, RED, True)])
-        x += 248
+            s.text(x + 236, y0 + 35, 36, 32, [("→", 24, RED, True)])
+        x += 276
 
     s.text(92, 470, 430, 30, [("Preprocessing odluke", 18, INK, True)])
     s.line(92, 508, 90, 6, RED)
@@ -392,55 +363,20 @@ def slide3() -> Slide:
             ("Event tagovi poput <uzdah> ostaju u text_raw/non_speech_events, ali se ne treniraju kao CTC znakovi jer bi se u character modu rastavili na <, u, z, ...", 13, MUTED, False),
         ],
     )
-    s.rect(92, 800, 1340, 78, INK)
+    s.rect(92, 790, 1340, 94, INK)
     s.text(
         120,
-        817,
+        808,
         1280,
-        42,
-        [("Programski tok: scripts/run_ds2_pipeline.py uzima VEPRAD manifest, generira PaddleSpeech podatke, trenira model, računa avg_1 checkpoint i evaluira VEPRAD val/test seen/unseen podskupove.", 13.5, CREAM, True)],
+        58,
+        [("Isti preprocessing i isti split protokol koriste se za sve modele, pa razlike u WER/CER rezultatima dolaze iz arhitekture modela i dekodiranja, a ne iz promjene podataka.", 13.5, CREAM, True)],
     )
-    footer(s, "Pipeline datoteke: scripts/run_ds2_pipeline.py, scripts/create_cv_split.py, scripts/train_kenlm_lm.py.")
     return s
 
 
 def slide4() -> Slide:
     s = Slide()
-    title(
-        s,
-        "04 · DEEPSPEECH2",
-        "DeepSpeech2 je akustički model koji smo trenirali na VEPRAD govoru.",
-        "Slika prikazuje paper-style tok; desni stupac navodi što smo točno mogli reproducirati bez mijenjanja PaddleSpeech sourcea.",
-    )
-    s.image(54, 238, 1130, 635, "../media/deepspeech2_architecture_generated_slide.png", "DeepSpeech2 architecture")
-    s.rect(1232, 242, 610, 446, INK)
-    s.text(1260, 266, 560, 36, [("Što smo zadržali", 18, GOLD, True)])
-    s.text(
-        1260,
-        320,
-        542,
-        166,
-        [
-            ("• konvolucijski front-end", 13.5, CREAM, False),
-            ("• bidirectional offline recurrent layers", 13.5, CREAM, False),
-            ("• character CTC targets", 13.5, CREAM, False),
-            ("• beam search decoding path", 13.5, CREAM, False),
-            ("• external word-level KenLM scorer", 13.5, CREAM, False),
-        ],
-    )
-    s.text(1260, 520, 560, 34, [("Razlike od paper konfiguracije", 17, GOLD, True)])
-    s.text(
-        1260,
-        568,
-        542,
-        94,
-        [
-            ("BatchNorm, exact spectrogram path, Nesterov optimizer and lookahead conv are not exposed cleanly in this PaddleSpeech DS2 path.", 12.6, SAND, False)
-        ],
-    )
-    s.rect(1232, 728, 610, 96, SAND, LINE)
-    s.text(1260, 750, 560, 48, [("Zaključak: VEPRAD run je paper-close approximation, ne bit-for-bit reprodukcija Deep Speech 2 rada.", 13.5, INK, True)])
-    footer(s, "Architecture image: presentation/deepspeech2_architecture_generated_slide.png; exact configs: conf/deepspeech2_paper_*.yaml.")
+    s.image(0, 0, 1920, 1080, "../media/deepspeech2_architecture_generated_slide.png", "DeepSpeech2 architecture")
     return s
 
 
@@ -449,53 +385,69 @@ def slide5() -> Slide:
     title(
         s,
         "05 · MODELI I HIPERPARAMETRI",
-        "Na istom VEPRAD splitu trenirali smo paper-small konfiguraciju i dvije dublje varijante.",
-        "Cilj nije bio samo dobiti jedan score, nego vidjeti što se na VEPRAD-u mijenja s dubinom i tipom rekurentne ćelije.",
+        "Paper-small i dvije varijante na istom VEPRAD splitu.",
+        "Konfiguracije su paper-close unutar PaddleSpeech DS2 opcija, ali nisu doslovna reprodukcija Deep Speech 2 rada.",
     )
     s.table(
         70,
-        260,
-        [280, 190, 170, 160, 150, 170, 230],
-        62,
-        ["Run", "recurrent", "layers", "hidden", "params", "epochs", "reason"],
+        250,
+        [280, 170, 150, 140, 145, 150, 230],
+        54,
+        ["Run", "cell", "layers", "hidden", "params", "epochs", "uloga"],
         [
-            ["paper_small_001", "GRU", "5 biRNN", "650", "36.21M", "20", "najbliže small DS2\nbez source edita"],
-            ["paper_7gru_001", "GRU", "7 biRNN", "650", "50.73M", "20", "+2 sloja,\nisti cell"],
-            ["paper_7lstm_001", "LSTM", "7 biRNN", "650", "67.61M", "20", "usporedba cella\ns istom dubinom"],
+            ["paper_small_001", "GRU", "5 biRNN", "650", "36.21M", "20", "najbliže small DS2"],
+            ["paper_7gru_001", "GRU", "7 biRNN", "650", "50.73M", "20", "+2 sloja"],
+            ["paper_7lstm_001", "LSTM", "7 biRNN", "650", "67.61M", "20", "usporedba cella"],
         ],
         RED,
-        10.5,
+        10.2,
     )
-    s.text(70, 560, 450, 30, [("Zajedničko u treningu", 18, INK, True)])
-    s.line(70, 598, 90, 6, TEAL)
+    s.text(70, 495, 450, 30, [("Što smo zadržali", 18, INK, True)])
+    s.line(70, 533, 90, 6, TEAL)
     s.text(
         70,
-        622,
-        620,
-        198,
+        555,
+        490,
+        180,
         [
-            ("• 2 convolution layers, no FC layers", 13.5, INK_2, False),
-            ("• fbank_kaldi 161 + CMVN, no augmentation", 13.5, INK_2, False),
-            ("• batch size 32, 8 workers", 13.5, INK_2, False),
-            ("• lr 5e-4, exponential decay 0.93, grad clip 5.0", 13.5, INK_2, False),
-            ("• avg_1 checkpoint used for final eval", 13.5, INK_2, False),
+            ("• konvolucijski front-end", 13.0, INK_2, False),
+            ("• bidirectional offline recurrent layers", 13.0, INK_2, False),
+            ("• character CTC targets", 13.0, INK_2, False),
+            ("• beam-search decoding path", 13.0, INK_2, False),
+            ("• external word-level KenLM scorer", 13.0, INK_2, False),
         ],
     )
-    s.text(780, 560, 450, 30, [("Zašto ovako", 18, INK, True)])
-    s.line(780, 598, 90, 6, GOLD)
+    s.text(610, 495, 470, 30, [("Zajednički trening", 18, INK, True)])
+    s.line(610, 533, 90, 6, GOLD)
     s.text(
-        780,
-        622,
-        650,
-        198,
+        610,
+        555,
+        500,
+        180,
         [
-            ("Paper-small run drži hidden size 650 i GRU kao najbližu izvedivu VEPRAD varijantu unutar PaddleSpeecha.", 13.5, INK_2, False),
-            ("Dublji GRU testira samu dubinu. LSTM testira je li druga recurrent cell bolja na istom VEPRAD splitu i decoding protokolu.", 13.5, MUTED, False),
+            ("• fbank_kaldi 161 + CMVN", 13.0, INK_2, False),
+            ("• no data augmentation", 13.0, INK_2, False),
+            ("• batch size 32, 8 workers", 13.0, INK_2, False),
+            ("• lr 5e-4, decay 0.93, grad clip 5.0", 13.0, INK_2, False),
+            ("• avg_1 checkpoint for final eval", 13.0, INK_2, False),
         ],
     )
-    s.rect(70, 880, 1370, 78, SAND, LINE)
-    s.text(96, 898, 1320, 36, [("Optimizer napomena: za razliku od DS2 papera, ovaj PaddleSpeech trainer koristi Adam + LR decay; to eksplicitno navodimo kao razliku od paper reprodukcije.", 13, INK, True)])
-    footer(s, "Konfiguracije: conf/deepspeech2_paper_small.yaml, conf/deepspeech2_paper_7gru.yaml, conf/deepspeech2_paper_7lstm.yaml.")
+    s.text(1110, 495, 620, 54, [("Razlike od paper konfiguracije", 17, INK, True)])
+    s.line(1110, 553, 90, 6, RED)
+    s.text(
+        1110,
+        578,
+        640,
+        180,
+        [
+            ("• BatchNorm nije izravno izložen u ovom DS2 pathu", 12.4, INK_2, False),
+            ("• exact log-spectrogram setup zamijenjen je fbank_kaldi značajkama", 12.4, INK_2, False),
+            ("• trainer koristi Adam + LR decay, ne Nesterov momentum", 12.4, INK_2, False),
+            ("• lookahead convolution nije uključena bez source edita", 12.4, INK_2, False),
+        ],
+    )
+    s.rect(70, 850, 1370, 90, SAND, LINE)
+    s.text(96, 870, 1320, 42, [("Zaključak: najbliži paper-small run koristi 5 bidirectional GRU slojeva s hidden size 650; dublji GRU i LSTM služe kao kontrolirane varijante na istom VEPRAD splitu.", 13, INK, True)])
     return s
 
 
@@ -548,25 +500,38 @@ def slide6() -> Slide:
         ],
     )
 
-    s.text(70, 540, 560, 30, [("Najbolji VEPRAD decoder", 18, INK, True)])
+    s.text(70, 540, 560, 30, [("WER: beam1 → KenLM", 18, INK, True)])
     s.line(70, 578, 90, 6, RED)
     s.table(
         70,
         612,
-        [290, 250, 170, 170, 170, 170],
-        58,
-        ["Model", "best decoder", "val WER", "test WER", "seen", "unseen"],
+        [190, 170, 170, 170],
+        62,
+        ["Validation", "all", "seen", "unseen"],
         [
-            ["paper-small GRU", "beam 40\na=2.5 b=0.3", "0.088", "0.118", "0.075", "0.160"],
-            ["7-layer GRU", "beam 40\na=2.5 b=0.3", "0.094", "0.127", "0.083", "0.171"],
-            ["7-layer LSTM", "beam 40\na=2.5 b=0.3", "0.123", "0.151", "0.095", "0.206"],
+            ["paper-small", "0.421→0.088\n-79%", "0.345→0.074\n-79%", "0.451→0.094\n-79%"],
+            ["7GRU", "0.400→0.094\n-77%", "0.328→0.077\n-77%", "0.429→0.101\n-77%"],
+            ["7LSTM", "0.515→0.123\n-76%", "0.430→0.090\n-79%", "0.549→0.137\n-75%"],
         ],
         RED,
-        10.3,
+        9.5,
     )
-    s.rect(70, 844, 1220, 58, SAND, LINE)
-    s.text(94, 858, 1170, 24, [("U sva tri modela isti decoder pobjeđuje na validation setu: beam 40, alpha 2.5, beta 0.3.", 12.2, INK, True)])
-    footer(s, "Machine-readable sweep: results/kenlm_sweep_all_models/metrics.json.")
+    s.table(
+        820,
+        612,
+        [190, 170, 170, 170],
+        62,
+        ["Frozen test", "all", "seen", "unseen"],
+        [
+            ["paper-small", "0.453→0.118\n-74%", "0.350→0.075\n-78%", "0.554→0.160\n-71%"],
+            ["7GRU", "0.429→0.127\n-70%", "0.324→0.083\n-75%", "0.532→0.171\n-68%"],
+            ["7LSTM", "0.535→0.151\n-72%", "0.440→0.095\n-78%", "0.629→0.206\n-67%"],
+        ],
+        TEAL,
+        9.5,
+    )
+    s.rect(70, 890, 1450, 58, SAND, LINE)
+    s.text(94, 904, 1390, 24, [("Sve KenLM vrijednosti koriste najbolji validation-selected decoder: beam 40, alpha 2.5, beta 0.3.", 12.2, INK, True)])
     return s
 
 
@@ -604,6 +569,7 @@ def slide7() -> Slide:
         s.text(x + 24, 596, 310, 30, [(value, 18.5, CREAM if color != GOLD else INK, True)])
         s.text(x + 24, 636, 300, 22, [(note, 10.5, CREAM if color != GOLD else INK, False)])
         x += 405
+
     s.text(70, 735, 610, 34, [("Zaključci", 19, INK, True)])
     s.line(70, 773, 90, 6, RED)
     s.text(
@@ -630,7 +596,18 @@ def slide7() -> Slide:
             ("• eventualno model/feature promjene koje zahtijevaju PaddleSpeech source edit", 13.5, INK_2, False),
         ],
     )
-    footer(s, "Tracked results: results/kenlm_sweep_all_models/metrics.json and per-run summary.md files.")
+    return s
+
+
+def slide8() -> Slide:
+    s = Slide()
+    s.rect(0, 0, 505, 1080, INK)
+    s.rect(505, 0, 28, 1080, RED)
+    s.text(66, 82, 320, 38, [("ROGJ 2025/26", 22, GOLD, True)])
+    s.text(66, 150, 330, 58, [("Tema 12", 38, CREAM, True)])
+    s.text(610, 330, 900, 90, [("THE END", 58, INK, True)])
+    s.line(616, 446, 420, 9, RED)
+    s.text(616, 520, 900, 52, [("Hvala na pažnji.", 25, INK_2, False)])
     return s
 
 
@@ -792,7 +769,7 @@ def build() -> None:
     if not ARCH_IMAGE.exists():
         raise SystemExit(f"Missing architecture image: {ARCH_IMAGE}")
 
-    slides = [slide1(), slide2(), slide3(), slide4(), slide5(), slide6(), slide7()]
+    slides = [slide1(), slide2(), slide3(), slide4(), slide5(), slide6(), slide7(), slide8()]
     files: dict[str, str | bytes] = {
         "[Content_Types].xml": content_types(),
         "_rels/.rels": package_rels(),
