@@ -603,9 +603,9 @@ def slide8() -> Slide:
     s = Slide()
     title(
         s,
-        "08 · ČISTA HF REPRODUKCIJA",
-        "Clean VEPRAD fine-tune reproducira 3.86% test WER.",
-        "Zasebni HF/Wav2Vec2 run na istom clean split protokolu; nije PaddleSpeech/DeepSpeech2 trening.",
+        "08 · NAJBOLJI MODEL?",
+        "Fine-tune postojećeg pred-treniranog modela.",
+        "CLASSLA Wav2Vec2 fine-tune na train-setu; nije PaddleSpeech/DeepSpeech2 trening.",
     )
     cards = [
         (
@@ -617,7 +617,7 @@ def slide8() -> Slide:
         ),
         (
             565,
-            "Trening",
+            "Fine-tune",
             "8 epochs · 408 updates",
             "3298 train iskaza, 5.03 h, fp16, lr 3e-4",
             TEAL,
