@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fine-tune a Hugging Face CTC ASR model on clean VEPRAD splits."""
+"""Fine-tune a Hugging Face CTC+LM ASR model on clean VEPRAD splits."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from scripts import create_cv_split, train_kenlm_lm
 
 TRACK_ID = "hf_wav2vec2_clean_20260614"
 DEFAULT_SPLIT_ID = "cv_hf_wav2vec2_clean_20260614_001"
-DEFAULT_MODEL = "classla/wav2vec2-xls-r-parlaspeech-hr"
+DEFAULT_MODEL = "classla/wav2vec2-large-slavic-parlaspeech-hr-lm"
 EVAL_COMPONENTS = (
     "val",
     "val_seen_speakers",
@@ -370,8 +370,9 @@ def evaluate_subset(
     rows: list[dict],
     subset: str,
     out_dir: Path,
-    decoder=None,
     decoder_name: str = "greedy",
+    decoder_mode: str = "greedy",
+    local_decoder=None,
 ) -> dict:
     import torch
     from torch.utils.data import DataLoader
@@ -397,15 +398,25 @@ def evaluate_subset(
             with torch.cuda.amp.autocast(enabled=args.fp16 and args.device == "cuda"):
                 logits = model(**batch).logits
 
-            if decoder is None:
+            if decoder_mode == "greedy":
                 pred_ids = torch.argmax(logits, dim=-1)
-                hyps = processor.batch_decode(pred_ids)
-            else:
+                hyps = processor.tokenizer.batch_decode(pred_ids)
+            elif decoder_mode == "bundled_lm":
+                decoded = processor.batch_decode(
+                    logits.detach().cpu().numpy(),
+                    beam_width=args.bundled_lm_beam,
+                )
+                hyps = decoded.text if hasattr(decoded, "text") else decoded
+            elif decoder_mode == "local_kenlm":
+                if local_decoder is None:
+                    raise RuntimeError("local_kenlm decoder requested without decoder")
                 logits_np = logits.detach().cpu().numpy()
                 hyps = [
-                    decoder.decode(logit, beam_width=args.kenlm_beam)
+                    local_decoder.decode(logit, beam_width=args.kenlm_beam)
                     for logit in logits_np
                 ]
+            else:
+                raise RuntimeError(f"Unknown decoder mode: {decoder_mode}")
 
             for item, hyp in zip(meta, hyps):
                 predictions.append(
@@ -435,7 +446,6 @@ def training_arguments(args: argparse.Namespace, output_dir: Path):
         "per_device_train_batch_size": args.train_batch_size,
         "gradient_accumulation_steps": args.gradient_accumulation_steps,
         "learning_rate": args.learning_rate,
-        "warmup_ratio": args.warmup_ratio,
         "num_train_epochs": args.epochs,
         "fp16": args.fp16 and args.device == "cuda",
         "save_strategy": "epoch",
@@ -447,6 +457,10 @@ def training_arguments(args: argparse.Namespace, output_dir: Path):
         "dataloader_num_workers": args.num_workers,
         "gradient_checkpointing": args.gradient_checkpointing,
     }
+    if args.warmup_steps is not None:
+        kwargs["warmup_steps"] = args.warmup_steps
+    else:
+        kwargs["warmup_ratio"] = args.warmup_ratio
     params = inspect.signature(TrainingArguments.__init__).parameters
     if "eval_strategy" in params:
         kwargs["eval_strategy"] = "no"
@@ -455,9 +469,9 @@ def training_arguments(args: argparse.Namespace, output_dir: Path):
     return TrainingArguments(**kwargs)
 
 
-def fine_tune(args: argparse.Namespace, split_dir: Path, rows_by_name: dict[str, list[dict]]) -> tuple[object, object, dict]:
+def load_model_and_processor(args: argparse.Namespace, rows_by_name: dict[str, list[dict]]):
     import torch
-    from transformers import AutoModelForCTC, AutoProcessor, Trainer, set_seed
+    from transformers import AutoModelForCTC, AutoProcessor, set_seed
 
     if args.seed is not None:
         set_seed(args.seed)
@@ -486,6 +500,56 @@ def fine_tune(args: argparse.Namespace, split_dir: Path, rows_by_name: dict[str,
     if missing and not args.allow_missing_tokenizer_chars:
         raise SystemExit(f"Tokenizer is missing VEPRAD characters: {missing}")
 
+    has_bundled_lm = hasattr(processor, "decoder")
+    if not has_bundled_lm and not args.allow_no_bundled_lm:
+        raise SystemExit(
+            f"Processor for {args.model_name} does not expose a bundled LM decoder. "
+            "Use an *-lm checkpoint or pass --allow-no-bundled-lm."
+        )
+    return model.to(args.device), processor, {
+        "tokenizer_coverage": coverage,
+        "processor_class": processor.__class__.__name__,
+        "model_class": model.__class__.__name__,
+        "has_bundled_lm": has_bundled_lm,
+    }
+
+
+def evaluate_all(
+    args: argparse.Namespace,
+    model,
+    processor,
+    rows_by_name: dict[str, list[dict]],
+    phase: str,
+    local_decoder=None,
+) -> dict:
+    metrics = {}
+    decoder_specs = [("greedy", "greedy")]
+    if hasattr(processor, "decoder"):
+        decoder_specs.append(("bundled_lm", "bundled_lm"))
+    if local_decoder is not None:
+        decoder_specs.append(("local_veprad_kenlm", "local_kenlm"))
+
+    for short_name, mode in decoder_specs:
+        report_name = f"{phase}_{short_name}"
+        metrics[report_name] = {}
+        for subset in EVAL_COMPONENTS:
+            metrics[report_name][subset] = evaluate_subset(
+                args,
+                model,
+                processor,
+                rows_by_name[subset],
+                subset,
+                args.results_root,
+                decoder_name=report_name,
+                decoder_mode=mode,
+                local_decoder=local_decoder,
+            )
+    return metrics
+
+
+def fine_tune(args: argparse.Namespace, model, processor, rows_by_name: dict[str, list[dict]]) -> dict:
+    from transformers import Trainer
+
     train_dataset = CTCManifestDataset(rows_by_name["train"], args.project_root, processor)
     collator = DataCollatorCTCWithPadding(processor)
     trainer = Trainer(
@@ -506,9 +570,14 @@ def fine_tune(args: argparse.Namespace, split_dir: Path, rows_by_name: dict[str,
         "model_name": args.model_name,
         "freeze_feature_encoder": args.freeze_feature_encoder,
         "gradient_checkpointing": args.gradient_checkpointing,
+        "per_device_train_batch_size": args.train_batch_size,
+        "gradient_accumulation_steps": args.gradient_accumulation_steps,
+        "learning_rate": args.learning_rate,
+        "warmup_steps": args.warmup_steps,
+        "warmup_ratio": args.warmup_ratio if args.warmup_steps is None else None,
     }
     write_json(args.results_root / "training_summary.json", train_summary)
-    return model.to(args.device), processor, {"tokenizer_coverage": coverage, "training": train_summary}
+    return train_summary
 
 
 def write_summary_markdown(path: Path, report: dict) -> None:
@@ -519,22 +588,35 @@ def write_summary_markdown(path: Path, report: dict) -> None:
         f"- Split: `{report['split_id']}`",
         f"- Train utterances: `{report['training']['train_utterances']}`",
         f"- Epochs: `{report['training']['epochs']}`",
-        f"- KenLM: order `{report['kenlm']['kenlm']['order']}`; kept "
-        f"`{report['kenlm']['lm_text_filter']['train_rows_after_filter']}` / "
-        f"`{report['kenlm']['lm_text_filter']['train_rows_before_filter']}` train rows",
+        f"- Bundled LM: `{report['external_lm']['has_bundled_lm']}`",
         "",
         "## Metrics",
         "",
         "| Decoder | Subset | WER | CER spaces | CER no spaces |",
         "|---|---:|---:|---:|---:|",
     ]
-    for decoder_name in ("greedy", "kenlm"):
+    for decoder_name in report["metrics"]:
         for subset in EVAL_COMPONENTS:
             metrics = report["metrics"][decoder_name][subset]
             lines.append(
                 f"| {decoder_name} | {subset} | {metrics['wer']:.6f} | "
                 f"{metrics['cer_including_spaces']:.6f} | {metrics['cer_no_spaces']:.6f} |"
             )
+    local_lm = report.get("local_veprad_kenlm") or {}
+    if local_lm.get("enabled") and local_lm.get("meta"):
+        filter_meta = local_lm["meta"]["lm_text_filter"]
+        lines.extend(
+            [
+                "",
+                "## Local VEPRAD KenLM",
+                "",
+                f"- Order: `{local_lm['meta']['kenlm']['order']}`",
+                f"- Kept train rows: `{filter_meta['train_rows_after_filter']}` / "
+                f"`{filter_meta['train_rows_before_filter']}`",
+                f"- Excluded exact/fuzzy rows: `{filter_meta['excluded_exact_rows']}` / "
+                f"`{filter_meta['excluded_fuzzy_rows']}`",
+            ]
+        )
     lines.append("")
     path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -550,12 +632,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model-name", default=DEFAULT_MODEL)
     parser.add_argument("--device", choices=("cuda", "cpu"), default="cuda")
     parser.add_argument("--seed", type=int, default=13)
-    parser.add_argument("--epochs", type=float, default=5.0)
-    parser.add_argument("--train-batch-size", type=int, default=4)
+    parser.add_argument("--epochs", type=float, default=8.0)
+    parser.add_argument("--train-batch-size", type=int, default=16)
     parser.add_argument("--gradient-accumulation-steps", type=int, default=4)
     parser.add_argument("--eval-batch-size", type=int, default=8)
-    parser.add_argument("--learning-rate", type=float, default=1e-4)
-    parser.add_argument("--warmup-ratio", type=float, default=0.1)
+    parser.add_argument("--learning-rate", type=float, default=3e-4)
+    parser.add_argument("--warmup-steps", type=int, default=500)
+    parser.add_argument("--warmup-ratio", type=float, default=0.0)
     parser.add_argument("--logging-steps", type=int, default=25)
     parser.add_argument("--save-total-limit", type=int, default=2)
     parser.add_argument("--num-workers", type=int, default=2)
@@ -563,7 +646,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--freeze-feature-encoder", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--gradient-checkpointing", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--allow-missing-tokenizer-chars", action="store_true")
+    parser.add_argument("--allow-no-bundled-lm", action="store_true")
     parser.add_argument("--resume-from-checkpoint")
+    parser.add_argument("--skip-pre-finetune-eval", action="store_true")
+    parser.add_argument("--skip-train", action="store_true")
+    parser.add_argument("--bundled-lm-beam", type=int, default=100)
+    parser.add_argument("--train-local-veprad-kenlm", action="store_true")
     parser.add_argument("--kenlm-order", type=int, default=5)
     parser.add_argument("--kenlm-memory", default="80%")
     parser.add_argument("--kenlm-beam", type=int, default=40)
@@ -595,55 +683,52 @@ def main() -> int:
     paths = manifest_paths(args.project_root, split_dir)
     rows_by_name = {name: read_jsonl(path) for name, path in paths.items()}
 
-    model, processor, training_report = fine_tune(args, split_dir, rows_by_name)
+    model, processor, load_report = load_model_and_processor(args, rows_by_name)
 
-    lm_dir = args.results_root / "details" / "lm"
-    kenlm_meta = train_lm(args, split_dir, lm_dir)
-    lm_validation = validate_to_file(
-        args,
-        split_dir,
-        args.results_root / "details" / "validation" / "kenlm_validation.json",
-        lm_dir=lm_dir,
-    )
-    decoder = build_lm_decoder(
-        processor,
-        lm_dir / "lm.klm",
-        alpha=args.kenlm_alpha,
-        beta=args.kenlm_beta,
-    )
-    write_json(
-        lm_dir / "decode_config.json",
-        {
-            "decoder": "pyctcdecode",
-            "beam": args.kenlm_beam,
-            "alpha": args.kenlm_alpha,
-            "beta": args.kenlm_beta,
-            "lm_path": rel_to_project(args.project_root, lm_dir / "lm.klm"),
-        },
-    )
+    metrics = {}
+    if not args.skip_pre_finetune_eval:
+        metrics.update(evaluate_all(args, model, processor, rows_by_name, "pre_finetune"))
 
-    metrics = {"greedy": {}, "kenlm": {}}
-    for subset in EVAL_COMPONENTS:
-        metrics["greedy"][subset] = evaluate_subset(
+    if args.skip_train:
+        training_summary = {
+            "global_step": 0,
+            "epochs": 0,
+            "train_utterances": len(rows_by_name["train"]),
+            "model_name": args.model_name,
+            "skipped": True,
+        }
+    else:
+        training_summary = fine_tune(args, model, processor, rows_by_name)
+        metrics.update(evaluate_all(args, model, processor, rows_by_name, "finetuned"))
+
+    kenlm_meta = None
+    lm_validation = None
+    if args.train_local_veprad_kenlm:
+        lm_dir = args.results_root / "details" / "lm"
+        kenlm_meta = train_lm(args, split_dir, lm_dir)
+        lm_validation = validate_to_file(
             args,
-            model,
-            processor,
-            rows_by_name[subset],
-            subset,
-            args.results_root,
-            decoder=None,
-            decoder_name="greedy",
+            split_dir,
+            args.results_root / "details" / "validation" / "local_veprad_kenlm_validation.json",
+            lm_dir=lm_dir,
         )
-        metrics["kenlm"][subset] = evaluate_subset(
-            args,
-            model,
+        decoder = build_lm_decoder(
             processor,
-            rows_by_name[subset],
-            subset,
-            args.results_root,
-            decoder=decoder,
-            decoder_name="kenlm",
+            lm_dir / "lm.klm",
+            alpha=args.kenlm_alpha,
+            beta=args.kenlm_beta,
         )
+        write_json(
+            lm_dir / "decode_config.json",
+            {
+                "decoder": "pyctcdecode",
+                "beam": args.kenlm_beam,
+                "alpha": args.kenlm_alpha,
+                "beta": args.kenlm_beta,
+                "lm_path": rel_to_project(args.project_root, lm_dir / "lm.klm"),
+            },
+        )
+        metrics.update(evaluate_all(args, model, processor, rows_by_name, "finetuned", local_decoder=decoder))
 
     report = {
         "schema_version": 1,
@@ -660,15 +745,32 @@ def main() -> int:
             * args.gradient_accumulation_steps,
             "eval_batch_size": args.eval_batch_size,
             "learning_rate": args.learning_rate,
-            "warmup_ratio": args.warmup_ratio,
+            "warmup_steps": args.warmup_steps,
+            "warmup_ratio": args.warmup_ratio if args.warmup_steps is None else None,
             "fp16": args.fp16 and args.device == "cuda",
             "seed": args.seed,
+            "bundled_lm_beam": args.bundled_lm_beam,
         },
         "split_validation": split_validation,
-        "lm_validation": lm_validation,
-        "kenlm": kenlm_meta,
-        "training": training_report["training"],
-        "tokenizer_coverage": training_report["tokenizer_coverage"],
+        "external_lm": {
+            "source": args.model_name,
+            "description": (
+                "Bundled checkpoint LM is fixed external ParlaMint LM from the "
+                "Hugging Face model; this script does not train it on VEPRAD."
+            ),
+            "has_bundled_lm": load_report["has_bundled_lm"],
+        },
+        "local_veprad_kenlm": {
+            "enabled": args.train_local_veprad_kenlm,
+            "validation": lm_validation,
+            "meta": kenlm_meta,
+        },
+        "training": training_summary,
+        "processor": {
+            "processor_class": load_report["processor_class"],
+            "model_class": load_report["model_class"],
+        },
+        "tokenizer_coverage": load_report["tokenizer_coverage"],
         "metrics": metrics,
     }
     write_json(args.results_root / "track_report.json", report)
