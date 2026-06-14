@@ -55,6 +55,8 @@ results/**/details/analysis/utterance_metrics.tsv
 results/**/details/analysis/top_30_errors.md
 results/**/details/analysis/*.tsv
 results/**/details/generated/
+results/**/details/predictions/
+results/**/details/validation/
 results/**/details/lm/*
 !results/**/details/lm/*.meta.json
 results/**/details/logs/eval_*.log
