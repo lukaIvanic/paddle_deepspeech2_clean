@@ -34,6 +34,13 @@ EVAL_COMPONENTS = (
 )
 
 
+def install_numpy_transformers_compat() -> None:
+    import numpy as np
+
+    if "bool" not in np.__dict__:
+        np.bool = bool
+
+
 def read_jsonl(path: Path) -> list[dict]:
     rows: list[dict] = []
     with path.open("r", encoding="utf-8") as f:
@@ -565,6 +572,24 @@ def evaluate_all(
     return metrics
 
 
+def read_existing_metrics(results_root: Path, prefix: str) -> dict:
+    metrics: dict[str, dict[str, dict]] = {}
+    metrics_root = results_root / "metrics"
+    if not metrics_root.exists():
+        return metrics
+    for decoder_dir in sorted(metrics_root.glob(f"{prefix}_*")):
+        if not decoder_dir.is_dir():
+            continue
+        subset_metrics = {}
+        for subset in EVAL_COMPONENTS:
+            metrics_path = decoder_dir / f"{subset}.json"
+            if metrics_path.exists():
+                subset_metrics[subset] = json.loads(metrics_path.read_text(encoding="utf-8"))
+        if subset_metrics:
+            metrics[decoder_dir.name] = subset_metrics
+    return metrics
+
+
 def fine_tune(args: argparse.Namespace, model, processor, rows_by_name: dict[str, list[dict]]) -> dict:
     from transformers import Trainer
 
@@ -647,6 +672,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--split-seed", type=int)
     parser.add_argument("--force-split", action="store_true")
     parser.add_argument("--force-run", action="store_true")
+    parser.add_argument("--reuse-existing-results", action="store_true")
     parser.add_argument("--model-name", default=DEFAULT_MODEL)
     parser.add_argument("--device", choices=("cuda", "cpu"), default="cuda")
     parser.add_argument("--seed", type=int, default=13)
@@ -684,10 +710,16 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    install_numpy_transformers_compat()
     args = parse_args()
     if args.results_root.exists() and args.force_run:
         shutil.rmtree(args.results_root)
-    if args.results_root.exists() and any(args.results_root.iterdir()) and not args.force_run:
+    if (
+        args.results_root.exists()
+        and any(args.results_root.iterdir())
+        and not args.force_run
+        and not args.reuse_existing_results
+    ):
         raise SystemExit(f"Refusing to overwrite existing results root: {args.results_root}")
     args.results_root.mkdir(parents=True, exist_ok=True)
     (args.results_root / "details").mkdir(exist_ok=True)
@@ -706,6 +738,8 @@ def main() -> int:
     metrics = {}
     if not args.skip_pre_finetune_eval:
         metrics.update(evaluate_all(args, model, processor, rows_by_name, "pre_finetune"))
+    else:
+        metrics.update(read_existing_metrics(args.results_root, "pre_finetune"))
 
     if args.skip_train:
         training_summary = {
