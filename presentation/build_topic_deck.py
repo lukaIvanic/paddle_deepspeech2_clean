@@ -20,7 +20,7 @@ SLIDE_W = 12192000
 SLIDE_H = 6858000
 PX_W = 1920
 PX_H = 1080
-SLIDE_COUNT = 8
+SLIDE_COUNT = 9
 
 INK = "15171A"
 INK_2 = "20282C"
@@ -601,6 +601,85 @@ def slide7() -> Slide:
 
 def slide8() -> Slide:
     s = Slide()
+    title(
+        s,
+        "08 · ČISTA HF REPRODUKCIJA",
+        "Clean VEPRAD fine-tune reproducira 3.86% test WER.",
+        "Zasebni HF/Wav2Vec2 run na istom clean split protokolu; nije PaddleSpeech/DeepSpeech2 trening.",
+    )
+    cards = [
+        (
+            70,
+            "Model",
+            "CLASSLA Wav2Vec2",
+            "Large HR checkpoint + LM decoder",
+            INK,
+        ),
+        (
+            565,
+            "Trening",
+            "8 epochs · 408 updates",
+            "3298 train iskaza, 5.03 h, fp16, lr 3e-4",
+            TEAL,
+        ),
+        (
+            1060,
+            "Split",
+            "clean CV + frozen test",
+            "val unseen: m05/m11/z07; test unseen: m04/z06/z14",
+            GOLD,
+        ),
+    ]
+    for x, head, value, note, color in cards:
+        s.rect(x, 250, 420, 145, color)
+        fg = CREAM if color != GOLD else INK
+        s.text(x + 24, 272, 360, 24, [(head, 13, fg, True)])
+        s.text(x + 24, 308, 360, 28, [(value, 15, fg, True)])
+        s.text(x + 24, 348, 360, 34, [(note, 9.6, fg, False)])
+
+    s.text(70, 442, 640, 30, [("Validation + test rezultati", 18, INK, True)])
+    s.line(70, 480, 90, 6, RED)
+    s.table(
+        70,
+        515,
+        [320, 145, 145, 145, 145, 185, 185],
+        56,
+        ["Decoder", "Val WER", "Val CER", "Test WER", "Test CER", "Test unseen WER", "Test unseen CER"],
+        [
+            ["pre-finetune greedy", "0.303", "0.149", "0.309", "0.154", "0.337", "0.169"],
+            ["pre-finetune bundled LM", "0.284", "0.147", "0.294", "0.155", "0.320", "0.170"],
+            ["fine-tuned greedy", "0.031", "0.008", "0.039", "0.008", "0.050", "0.010"],
+            ["fine-tuned bundled LM", "0.037", "0.010", "0.042", "0.009", "0.051", "0.011"],
+        ],
+        TEAL,
+        9.0,
+    )
+    s.text(
+        70,
+        780,
+        1360,
+        34,
+        [("CER je prikazan bez razmaka. Bundled LM je fiksni eksterni ParlaMint LM iz checkpointa; ne treniramo VEPRAD KenLM, pa nema text-only LM curenja iz traina prema val/testu.", 11.5, MUTED, False)],
+    )
+
+    callouts = [
+        ("Najbolji full test", "greedy fine-tuned", "3.86% WER · 0.75% CER", RED),
+        ("Unseen speakers", "stroži dio testa", "4.97% WER · 0.99% CER", TEAL),
+        ("LM nakon fine-tunea", "blago lošiji", "4.24% vs 3.86% WER", GOLD),
+    ]
+    x = 90
+    for head, value, note, color in callouts:
+        s.rect(x, 845, 390, 105, color)
+        fg = CREAM if color != GOLD else INK
+        s.text(x + 24, 862, 330, 22, [(head, 12.5, fg, True)])
+        s.text(x + 24, 890, 330, 28, [(value, 16.5, fg, True)])
+        s.text(x + 24, 922, 330, 20, [(note, 10.5, fg, False)])
+        x += 430
+    return s
+
+
+def slide9() -> Slide:
+    s = Slide()
     s.rect(0, 0, 505, 1080, INK)
     s.rect(505, 0, 28, 1080, RED)
     s.text(66, 82, 320, 38, [("ROGJ 2025/26", 22, GOLD, True)])
@@ -769,7 +848,7 @@ def build() -> None:
     if not ARCH_IMAGE.exists():
         raise SystemExit(f"Missing architecture image: {ARCH_IMAGE}")
 
-    slides = [slide1(), slide2(), slide3(), slide4(), slide5(), slide6(), slide7(), slide8()]
+    slides = [slide1(), slide2(), slide3(), slide4(), slide5(), slide6(), slide7(), slide8(), slide9()]
     files: dict[str, str | bytes] = {
         "[Content_Types].xml": content_types(),
         "_rels/.rels": package_rels(),
